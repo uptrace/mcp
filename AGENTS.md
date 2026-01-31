@@ -15,8 +15,12 @@ mcp/
 ├── tools/                  # MCP tool implementations
 │   ├── tools.go            # Register() for all tools
 │   └── greet.go            # Example greet tool
+├── uptraceapi/             # Generated Uptrace API client (do not edit)
+│   ├── client.go           # HTTP client methods
+│   ├── types.go            # API types and models
+│   └── ...                 # Other generated files
 └── openapi/                # Git submodule: Uptrace OpenAPI specification
-    └── openapi.yaml        # OpenAPI 3.x spec for Uptrace API
+    └── openapi.yaml        # OpenAPI 3.1 spec for Uptrace API
 ```
 
 ## OpenAPI Specification
@@ -30,7 +34,18 @@ Use this spec to generate API clients or reference available endpoints.
 - `github.com/modelcontextprotocol/go-sdk` - MCP protocol implementation
 - `go.uber.org/fx` - Dependency injection framework
 - `github.com/urfave/cli/v3` - CLI argument parsing
-- `gopkg.in/yaml.v3` - YAML config parsing
+- `github.com/goccy/go-yaml` - YAML config parsing
+- `github.com/doordash-oss/oapi-codegen-dd/v3` - Generated API client runtime
+
+## Code Generation
+
+The `uptraceapi/` package is generated from the OpenAPI spec. Do not edit manually.
+
+```bash
+task generate  # Regenerate API client from openapi/openapi.yaml
+```
+
+Config: `oapi-codegen.yaml`
 
 ---
 
@@ -132,6 +147,7 @@ func Run(ctx context.Context, cmd *cli.Command, options ...fx.Option) error
 | `New(conf, ...fx.Option)` | `bootstrap` | Create fx.App with config |
 | `Run(ctx, cmd, ...fx.Option)` | `bootstrap` | Load config and run fx app |
 | `Register(server)` | `tools` | Register all MCP tools |
+| `NewClient(server, opts)` | `uptraceapi` | Create Uptrace API client (generated) |
 
 ### Structs
 
