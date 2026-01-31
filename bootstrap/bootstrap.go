@@ -104,9 +104,19 @@ func NewSlog(conf *appconf.Config) LoggerResults {
 func NewUptraceClient(conf *appconf.Config) (*uptraceapi.Client, error) {
 	return uptraceapi.NewDefaultClient(
 		conf.Uptrace.APIURL,
+		runtime.WithHTTPClient(&httpClient{http.DefaultClient}),
 		runtime.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 			req.Header.Set("Authorization", "Bearer "+conf.Uptrace.APIToken)
 			return nil
 		}),
 	)
+}
+
+// httpClient wraps http.Client to implement runtime.HttpRequestDoer.
+type httpClient struct {
+	*http.Client
+}
+
+func (c *httpClient) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	return c.Client.Do(req.WithContext(ctx))
 }

@@ -2,8 +2,8 @@ version: "3"
 
 tasks:
   dev:
-    desc: Start the MCP server with hot-reload
-    cmd: watchexec -r -e go,yaml -- go run ./cmd/mcp-server --config config.yaml
+    desc: Start the MCP server with hot-reload (HTTP mode)
+    cmd: watchexec -r -e go,yaml -- go run ./cmd/mcp-server --config config.yaml --http :8888 --debug
 
   build:
     desc: Build the MCP server binary

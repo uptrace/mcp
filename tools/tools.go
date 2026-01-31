@@ -11,4 +11,5 @@ import (
 func Register(server *mcp.Server, client *uptraceapi.Client, conf *appconf.Config) {
 	registerGreetTool(server)
 	registerListSpansTool(server, client, conf)
+	registerListMonitorsTool(server, client, conf)
 }

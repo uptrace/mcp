@@ -3,6 +3,7 @@ package tools
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -24,7 +25,7 @@ func handleGreet(
 	params *mcp.CallToolParamsFor[GreetArgs],
 ) (*mcp.CallToolResultFor[struct{}], error) {
 	greeting := fmt.Sprintf("Hello, %s! Welcome to Uptrace MCP.", params.Arguments.Name)
-
+	slog.Info(greeting)
 	return &mcp.CallToolResultFor[struct{}]{
 		Content: []mcp.Content{
 			&mcp.TextContent{Text: greeting},

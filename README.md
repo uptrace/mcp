@@ -51,13 +51,23 @@ uptrace:
 
 ### Run
 
+**Stdio mode** (for Claude Code/Desktop):
 ```bash
 ./mcp-server --config config.yaml
 ```
 
+**HTTP mode** (for web clients):
+```bash
+./mcp-server --config config.yaml --http :8080
+```
+
 ## Adding to Claude Code
 
-Add the following to your Claude Code MCP settings (`~/.claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+Claude Code supports two transport modes for MCP servers:
+
+### Option 1: Stdio Mode (Recommended)
+
+Claude spawns the server as a subprocess. Add to `~/.claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
 ```json
 {
@@ -72,11 +82,35 @@ Add the following to your Claude Code MCP settings (`~/.claude/claude_desktop_co
 
 Replace `/path/to/mcp-server` and `/path/to/config.yaml` with absolute paths.
 
+### Option 2: HTTP Mode
+
+Run the server separately and connect via HTTP. This is useful for:
+- Sharing one server across multiple clients
+- Running the server on a remote machine
+- Development with hot-reload (`task dev`)
+
+1. Start the server:
+   ```bash
+   ./mcp-server --config config.yaml --http :8888
+   ```
+
+2. Configure Claude Code:
+   ```json
+   {
+     "mcpServers": {
+       "uptrace": {
+         "url": "http://localhost:8888/mcp"
+       }
+     }
+   }
+   ```
+
 ## Available Tools
 
 | Tool | Description |
 |------|-------------|
 | `list_spans` | List spans from Uptrace. Supports time range filtering, trace ID filtering, and pagination. |
+| `list_monitors` | List monitors from Uptrace. View configured alerts and monitoring rules. |
 | `greet` | Example greeting tool (for testing) |
 
 ### list_spans
@@ -92,6 +126,16 @@ Fetch spans from Uptrace for analyzing distributed traces.
 **Example usage in Claude:**
 > "Show me spans from the last hour"
 > "Find spans for trace ID abc123"
+
+### list_monitors
+
+Fetch configured monitors (alerts) from Uptrace.
+
+**Parameters:** None
+
+**Example usage in Claude:**
+> "List all monitors"
+> "Show me the configured alerts"
 
 ## Configuration
 
