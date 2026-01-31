@@ -20,3 +20,9 @@ tasks:
   tidy:
     desc: Tidy go modules
     cmd: go mod tidy
+
+  generate:
+    desc: Generate OpenAPI client bindings
+    cmds:
+      - rm -rf uptraceapi/
+      - go run github.com/doordash-oss/oapi-codegen-dd/v3/cmd/oapi-codegen@latest -config oapi-codegen.yaml openapi/openapi.yaml
