@@ -3,9 +3,11 @@ package bootstrap
 import (
 	"context"
 	"log/slog"
+	"net/http"
 	"os"
 	"strings"
 
+	"github.com/doordash-oss/oapi-codegen-dd/v3/pkg/runtime"
 	slogattrs "github.com/go-slog/otelslog"
 	slogmulti "github.com/samber/slog-multi"
 	"github.com/urfave/cli/v3"
@@ -14,6 +16,7 @@ import (
 	"go.uber.org/fx/fxevent"
 
 	"github.com/uptrace/mcp/appconf"
+	"github.com/uptrace/mcp/uptraceapi"
 )
 
 const (
@@ -95,4 +98,15 @@ func NewSlog(conf *appconf.Config) LoggerResults {
 		Logger: logger,
 		Level:  level,
 	}
+}
+
+// NewUptraceClient creates a new Uptrace API client from config.
+func NewUptraceClient(conf *appconf.Config) (*uptraceapi.Client, error) {
+	return uptraceapi.NewDefaultClient(
+		conf.Uptrace.APIURL,
+		runtime.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+			req.Header.Set("Authorization", "Bearer "+conf.Uptrace.APIToken)
+			return nil
+		}),
+	)
 }

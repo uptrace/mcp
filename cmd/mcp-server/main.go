@@ -10,8 +10,10 @@ import (
 	"github.com/urfave/cli/v3"
 	"go.uber.org/fx"
 
+	"github.com/uptrace/mcp/appconf"
 	"github.com/uptrace/mcp/bootstrap"
 	"github.com/uptrace/mcp/tools"
+	"github.com/uptrace/mcp/uptraceapi"
 )
 
 func main() {
@@ -30,6 +32,7 @@ func main() {
 			return bootstrap.Run(
 				ctx,
 				cmd,
+				fx.Provide(bootstrap.NewUptraceClient),
 				fx.Invoke(runServer),
 			)
 		},
@@ -40,11 +43,19 @@ func main() {
 	}
 }
 
-func runServer(ctx context.Context, logger *slog.Logger) error {
+func runServer(
+	ctx context.Context,
+	logger *slog.Logger,
+	client *uptraceapi.Client,
+	conf *appconf.Config,
+) error {
 	server := newServer()
-	tools.Register(server)
+	tools.Register(server, client, conf)
 
-	logger.Info("starting MCP server", slog.String("name", bootstrap.AppName), slog.String("version", bootstrap.AppVersion))
+	logger.Info("starting MCP server",
+		slog.String("name", bootstrap.AppName),
+		slog.String("version", bootstrap.AppVersion),
+	)
 
 	return server.Run(ctx, mcp.NewStdioTransport())
 }

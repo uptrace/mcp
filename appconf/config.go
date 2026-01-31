@@ -24,7 +24,10 @@ type LoggingConfig struct {
 }
 
 type UptraceConfig struct {
-	DSN string `yaml:"dsn"`
+	DSN       string `yaml:"dsn"`
+	APIURL    string `yaml:"api_url"`
+	APIToken  string `yaml:"api_token"`
+	ProjectID int64  `yaml:"project_id"`
 }
 
 // Load reads and parses a YAML config file from the given path.
