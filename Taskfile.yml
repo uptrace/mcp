@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  dev:
+    desc: Start the MCP server with hot-reload
+    cmd: watchexec -r -e go,yaml -- go run ./cmd/mcp-server --config config.yaml
+
+  build:
+    desc: Build the MCP server binary
+    cmd: go build -o mcp-server ./cmd/mcp-server
+
+  test:
+    desc: Run tests
+    cmd: go test ./...
+
+  lint:
+    desc: Run linter
+    cmd: golangci-lint run
+
+  tidy:
+    desc: Tidy go modules
+    cmd: go mod tidy

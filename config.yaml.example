@@ -1,0 +1,9 @@
+# service:
+#   start_timeout: 15s  # optional, default: 15s
+#   stop_timeout: 15s   # optional, default: 15s
+
+# logging:
+#   level: info  # optional, default: info (debug, info, warn, error)
+
+uptrace:
+  dsn: "https://<token>@api.uptrace.dev/<project_id>"

@@ -6,17 +6,17 @@ Uptrace MCP Server written in Go using `github.com/modelcontextprotocol/go-sdk`.
 
 ```
 mcp/
-├── cmd/                    # Application entrypoints
-│   └── mcp-server/         # Main server binary
-├── internal/               # Private application code
-│   ├── config/             # Configuration loading
-│   ├── handler/            # MCP request handlers
-│   ├── uptrace/            # Uptrace API client
-│   └── tools/              # MCP tool implementations
-├── openapi/                # Git submodule: Uptrace OpenAPI specification
-│   └── openapi.yaml        # OpenAPI 3.x spec for Uptrace API
-├── pkg/                    # Public libraries (if any)
-└── module.go               # Root fx module
+├── cmd/mcp-server/         # Application entrypoint
+│   └── main.go
+├── appconf/                # Configuration loading
+│   └── config.go
+├── bootstrap/              # fx app bootstrap
+│   └── bootstrap.go
+├── tools/                  # MCP tool implementations
+│   ├── tools.go            # Register() for all tools
+│   └── greet.go            # Example greet tool
+└── openapi/                # Git submodule: Uptrace OpenAPI specification
+    └── openapi.yaml        # OpenAPI 3.x spec for Uptrace API
 ```
 
 ## OpenAPI Specification
@@ -29,6 +29,8 @@ Use this spec to generate API clients or reference available endpoints.
 
 - `github.com/modelcontextprotocol/go-sdk` - MCP protocol implementation
 - `go.uber.org/fx` - Dependency injection framework
+- `github.com/urfave/cli/v3` - CLI argument parsing
+- `gopkg.in/yaml.v3` - YAML config parsing
 
 ---
 
@@ -102,26 +104,19 @@ func ProcessInPlace(data []byte) { ... }
 
 ### Dependency Injection
 
-Uses `go.uber.org/fx` throughout. Each module has `module.go` with fx definitions.
+Uses `go.uber.org/fx` throughout. Bootstrap provides core dependencies, additional modules passed via `fx.Option`.
 
 ```go
-// internal/handler/module.go
-package handler
-
-import "go.uber.org/fx"
-
-var Module = fx.Options(
-    fx.Provide(NewHandler),
+// cmd/mcp-server/main.go
+bootstrap.Run(
+    ctx,
+    cmd,
+    fx.Invoke(runServer),
 )
 
-// internal/uptrace/module.go
-package uptrace
-
-import "go.uber.org/fx"
-
-var Module = fx.Options(
-    fx.Provide(NewClient),
-)
+// bootstrap/bootstrap.go - provides *appconf.Config, *slog.Logger
+func New(conf *appconf.Config, options ...fx.Option) *fx.App
+func Run(ctx context.Context, cmd *cli.Command, options ...fx.Option) error
 ```
 
 ---
@@ -130,35 +125,33 @@ var Module = fx.Options(
 
 ### Functions
 
-<!-- Document all exported functions here -->
-
 | Function | Package | Description |
 |----------|---------|-------------|
-| - | - | No functions defined yet |
+| `Load(path string)` | `appconf` | Load config from YAML file |
+| `Parse(data []byte)` | `appconf` | Parse YAML bytes into Config |
+| `New(conf, ...fx.Option)` | `bootstrap` | Create fx.App with config |
+| `Run(ctx, cmd, ...fx.Option)` | `bootstrap` | Load config and run fx app |
+| `Register(server)` | `tools` | Register all MCP tools |
 
 ### Structs
 
-<!-- Document all exported structs and their fields here -->
-
-| Struct | Package | Description |
-|--------|---------|-------------|
-| - | - | No structs defined yet |
+| Struct | Package | Fields |
+|--------|---------|--------|
+| `Config` | `appconf` | `Uptrace UptraceConfig` |
+| `UptraceConfig` | `appconf` | `DSN string` |
+| `GreetArgs` | `tools` | `Name string` |
 
 ### Package-Level Variables
 
-<!-- Document all exported package-level variables here -->
-
 | Variable | Package | Type | Description |
 |----------|---------|------|-------------|
-| - | - | - | No variables defined yet |
+| - | - | - | None |
 
 ### Constants
 
-<!-- Document all exported constants here -->
-
 | Constant | Package | Value | Description |
 |----------|---------|-------|-------------|
-| - | - | - | No constants defined yet |
+| - | - | - | None |
 
 ---
 
@@ -168,25 +161,34 @@ This server exposes the following MCP tools:
 
 | Tool Name | Description |
 |-----------|-------------|
-| - | No tools implemented yet |
+| `greet` | Say hello to someone (example tool) |
 
 ---
 
 ## Configuration
 
-Environment variables:
+Config file (`config.yaml`):
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `UPTRACE_DSN` | Yes | - | Uptrace DSN for API access |
+```yaml
+uptrace:
+  dsn: "https://<token>@api.uptrace.dev/<project_id>"
+```
+
+See `config.yaml.example` for reference.
 
 ---
 
 ## Development
 
 ```bash
-# Run the server
-go run ./cmd/mcp-server
+# Copy example config
+cp config.yaml.example config.yaml
+
+# Run with hot-reload (requires watchexec)
+task dev
+
+# Run manually
+go run ./cmd/mcp-server --config config.yaml
 
 # Run tests
 go test ./...
