@@ -4,46 +4,9 @@ package uptraceapi
 
 import (
 	"encoding/json"
-	"time"
 
-	"github.com/doordash-oss/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
-
-type TimeStart_OneOf struct {
-	runtime.Either[float32, time.Time]
-}
-
-func (t *TimeStart_OneOf) Validate() error {
-	if t.IsA() {
-		if v, ok := any(t.A).(runtime.Validator); ok {
-			return v.Validate()
-		}
-	}
-	if t.IsB() {
-		if v, ok := any(t.B).(runtime.Validator); ok {
-			return v.Validate()
-		}
-	}
-	return nil
-}
-
-type TimeEnd_OneOf struct {
-	runtime.Either[float32, time.Time]
-}
-
-func (t *TimeEnd_OneOf) Validate() error {
-	if t.IsA() {
-		if v, ok := any(t.A).(runtime.Validator); ok {
-			return v.Validate()
-		}
-	}
-	if t.IsB() {
-		if v, ok := any(t.B).(runtime.Validator); ok {
-			return v.Validate()
-		}
-	}
-	return nil
-}
 
 type RepeatInterval_OneOf struct {
 	union json.RawMessage

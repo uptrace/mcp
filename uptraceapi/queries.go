@@ -3,94 +3,66 @@
 package uptraceapi
 
 import (
-	"github.com/doordash-oss/oapi-codegen-dd/v3/pkg/runtime"
+	"time"
+
+	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
 
-type TimeStart = struct {
-	TimeStart_OneOf *TimeStart_OneOf `json:"-"`
-}
+// TimeStart RFC3339 timestamp.
+type TimeStart = time.Time
 
-type TimeEnd = struct {
-	TimeEnd_OneOf *TimeEnd_OneOf `json:"-"`
-}
+// TimeEnd RFC3339 timestamp.
+type TimeEnd = time.Time
 
 type Limit = int32
 
 type ListSpansQuery struct {
-	// TimeStart Start time as unix milliseconds or RFC3339 timestamp.
-	TimeStart TimeStart `json:"time_start"`
+	// TimeStart Start time as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time as RFC3339 timestamp." validate:"required"`
 
-	// TimeEnd End time as unix milliseconds or RFC3339 timestamp.
-	TimeEnd TimeEnd `json:"time_end"`
+	// TimeEnd End time as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time as RFC3339 timestamp." validate:"required"`
 
 	// TraceID Filter spans by trace ID.
-	TraceID *string `json:"trace_id,omitempty"`
+	TraceID *string `json:"trace_id,omitempty" jsonschema:"Filter spans by trace ID."`
 
 	// ID Filter spans by span ID.
-	ID *int `json:"id,omitempty"`
+	ID *int `json:"id,omitempty" jsonschema:"Filter spans by span ID."`
 
 	// ParentID Filter spans by parent span ID.
-	ParentID *int `json:"parent_id,omitempty"`
+	ParentID *int `json:"parent_id,omitempty" jsonschema:"Filter spans by parent span ID."`
 
 	// Limit Limit number of results.
-	Limit *Limit `json:"limit,omitempty"`
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
 }
 
 func (l ListSpansQuery) Validate() error {
-	var errors runtime.ValidationErrors
-	if v, ok := any(l.TimeStart).(runtime.Validator); ok {
-		if err := v.Validate(); err != nil {
-			errors = errors.Append("TimeStart", err)
-		}
-	}
-	if v, ok := any(l.TimeEnd).(runtime.Validator); ok {
-		if err := v.Validate(); err != nil {
-			errors = errors.Append("TimeEnd", err)
-		}
-	}
-	if len(errors) == 0 {
-		return nil
-	}
-	return errors
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type ListSpanGroupsQuery struct {
-	// TimeStart Start time as unix milliseconds or RFC3339 timestamp.
-	TimeStart TimeStart `json:"time_start"`
+	// TimeStart Start time as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time as RFC3339 timestamp." validate:"required"`
 
-	// TimeEnd End time as unix milliseconds or RFC3339 timestamp.
-	TimeEnd TimeEnd `json:"time_end"`
+	// TimeEnd End time as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time as RFC3339 timestamp." validate:"required"`
 
 	// Query Aggregate spans using the specified query.
-	Query *string `json:"query,omitempty"`
+	Query *string `json:"query,omitempty" jsonschema:"Aggregate spans using the specified query."`
 
 	// Limit Limit number of results.
-	Limit *Limit `json:"limit,omitempty"`
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
 
 	// Search Search for spans containing option1 or option2.
-	Search *string `json:"search,omitempty"`
+	Search *string `json:"search,omitempty" jsonschema:"Search for spans containing option1 or option2."`
 
 	// DurationGte Duration greater than or equal to N (microseconds).
-	DurationGte *int64 `json:"duration_gte,omitempty"`
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (microseconds)."`
 
 	// DurationLt Duration less than N (microseconds).
-	DurationLt *int64 `json:"duration_lt,omitempty"`
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (microseconds)."`
 }
 
 func (l ListSpanGroupsQuery) Validate() error {
-	var errors runtime.ValidationErrors
-	if v, ok := any(l.TimeStart).(runtime.Validator); ok {
-		if err := v.Validate(); err != nil {
-			errors = errors.Append("TimeStart", err)
-		}
-	}
-	if v, ok := any(l.TimeEnd).(runtime.Validator); ok {
-		if err := v.Validate(); err != nil {
-			errors = errors.Append("TimeEnd", err)
-		}
-	}
-	if len(errors) == 0 {
-		return nil
-	}
-	return errors
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }

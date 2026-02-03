@@ -20,7 +20,8 @@ type ServiceConfig struct {
 }
 
 type LoggingConfig struct {
-	Level string `yaml:"level"`
+	Level       string `yaml:"level"`
+	MaxBodySize int    `yaml:"max_body_size"`
 }
 
 type UptraceConfig struct {

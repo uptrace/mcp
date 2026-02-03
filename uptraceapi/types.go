@@ -8,27 +8,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/doordash-oss/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 type AnnotationCreateRequest struct {
 	// Name Annotation name.
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name" jsonschema:"Annotation name." validate:"required"`
 
 	// Description Annotation description text in Markdown format.
-	Description *string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty" jsonschema:"Annotation description text in Markdown format."`
 
 	// Color Color to be used in charts.
-	Color *string `json:"color,omitempty"`
+	Color *string `json:"color,omitempty" jsonschema:"Color to be used in charts."`
 
 	// Attrs Key-value metadata.
-	Attrs map[string]string `json:"attrs,omitempty"`
+	Attrs map[string]string `json:"attrs,omitempty" jsonschema:"Key-value metadata."`
 
 	// Fingerprint Unique string used for deduplication.
-	Fingerprint *string `json:"fingerprint,omitempty"`
+	Fingerprint *string `json:"fingerprint,omitempty" jsonschema:"Unique string used for deduplication."`
 
 	// Time Overrides annotation time in RFC3339 format.
-	Time *time.Time `json:"time,omitempty"`
+	Time *time.Time `json:"time,omitempty" jsonschema:"Overrides annotation time in RFC3339 format."`
 }
 
 func (a AnnotationCreateRequest) Validate() error {
@@ -162,14 +162,14 @@ func (l LinkDataRequest) Validate() error {
 
 type UserFixture struct {
 	// Key Unique fixture key.
-	Key string `json:"key" validate:"required"`
+	Key string `json:"key" jsonschema:"Unique fixture key." validate:"required"`
 
 	// Name Display name.
-	Name  string        `json:"name" validate:"required"`
+	Name  string        `json:"name" jsonschema:"Display name." validate:"required"`
 	Email runtime.Email `json:"email" validate:"required"`
 
 	// Password Plain-text password (hashed by Uptrace).
-	Password string `json:"password" validate:"required"`
+	Password string `json:"password" jsonschema:"Plain-text password (hashed by Uptrace)." validate:"required"`
 }
 
 func (u UserFixture) Validate() error {
@@ -198,11 +198,11 @@ type UserTokenFixture struct {
 	Key string `json:"key" validate:"required"`
 
 	// UserKey References users.key.
-	UserKey string `json:"userKey" validate:"required"`
+	UserKey string `json:"userKey" jsonschema:"References users.key." validate:"required"`
 	Token   string `json:"token" validate:"required"`
 
 	// Name Human-readable token name.
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" jsonschema:"Human-readable token name."`
 }
 
 func (u UserTokenFixture) Validate() error {
@@ -223,10 +223,10 @@ type OrgUserFixture struct {
 	Key string `json:"key" validate:"required"`
 
 	// OrgKey References orgs.key.
-	OrgKey string `json:"orgKey" validate:"required"`
+	OrgKey string `json:"orgKey" jsonschema:"References orgs.key." validate:"required"`
 
 	// UserKey References users.key.
-	UserKey string             `json:"userKey" validate:"required"`
+	UserKey string             `json:"userKey" jsonschema:"References users.key." validate:"required"`
 	Role    OrgUserFixtureRole `json:"role" validate:"required"`
 }
 
@@ -257,7 +257,7 @@ type ProjectFixture struct {
 	Name string `json:"name" validate:"required"`
 
 	// OrgKey References orgs.key.
-	OrgKey      string  `json:"orgKey" validate:"required"`
+	OrgKey      string  `json:"orgKey" jsonschema:"References orgs.key." validate:"required"`
 	Description *string `json:"description,omitempty"`
 }
 
@@ -269,7 +269,7 @@ type ProjectTokenFixture struct {
 	Key string `json:"key" validate:"required"`
 
 	// ProjectKey References projects.key.
-	ProjectKey string  `json:"projectKey" validate:"required"`
+	ProjectKey string  `json:"projectKey" jsonschema:"References projects.key." validate:"required"`
 	Token      string  `json:"token" validate:"required"`
 	Name       *string `json:"name,omitempty"`
 }
@@ -282,10 +282,10 @@ type ProjectUserFixture struct {
 	Key string `json:"key" validate:"required"`
 
 	// ProjectKey References projects.key.
-	ProjectKey string `json:"projectKey" validate:"required"`
+	ProjectKey string `json:"projectKey" jsonschema:"References projects.key." validate:"required"`
 
 	// OrgUserKey References orgUsers.key.
-	OrgUserKey string                      `json:"orgUserKey" validate:"required"`
+	OrgUserKey string                      `json:"orgUserKey" jsonschema:"References orgUsers.key." validate:"required"`
 	PermLevel  ProjectUserFixturePermLevel `json:"permLevel" validate:"required"`
 }
 
@@ -344,7 +344,7 @@ type BaseMonitorRequest struct {
 	ChannelIds            []int  `json:"channelIds,omitempty"`
 
 	// RepeatInterval Monitor repeat interval configuration.
-	RepeatInterval *RepeatInterval `json:"repeatInterval,omitempty"`
+	RepeatInterval *RepeatInterval `json:"repeatInterval,omitempty" jsonschema:"Monitor repeat interval configuration."`
 }
 
 func (b BaseMonitorRequest) Validate() error {
@@ -372,7 +372,7 @@ type MetricMonitorRequest struct {
 	ChannelIds            []int  `json:"channelIds,omitempty"`
 
 	// RepeatInterval Monitor repeat interval configuration.
-	RepeatInterval *RepeatInterval          `json:"repeatInterval,omitempty"`
+	RepeatInterval *RepeatInterval          `json:"repeatInterval,omitempty" jsonschema:"Monitor repeat interval configuration."`
 	Type           MetricMonitorRequestType `json:"type" validate:"required"`
 	Params         MetricMonitorParams      `json:"params"`
 }
@@ -412,7 +412,7 @@ type ErrorMonitorRequest struct {
 	ChannelIds            []int  `json:"channelIds,omitempty"`
 
 	// RepeatInterval Monitor repeat interval configuration.
-	RepeatInterval *RepeatInterval         `json:"repeatInterval,omitempty"`
+	RepeatInterval *RepeatInterval         `json:"repeatInterval,omitempty" jsonschema:"Monitor repeat interval configuration."`
 	Type           ErrorMonitorRequestType `json:"type" validate:"required"`
 	Params         ErrorMonitorParams      `json:"params"`
 }
@@ -453,7 +453,7 @@ type MetricMonitorParams struct {
 	BoundsSource *MetricMonitorParamsBoundsSource `json:"boundsSource,omitempty"`
 
 	// Resolution Resolution in milliseconds.
-	Resolution      *float32                      `json:"resolution,omitempty"`
+	Resolution      *float32                      `json:"resolution,omitempty" jsonschema:"Resolution in milliseconds."`
 	NumEvalPoints   *int                          `json:"numEvalPoints,omitempty"`
 	MinAllowedValue *float32                      `json:"minAllowedValue,omitempty"`
 	MaxAllowedValue *float32                      `json:"maxAllowedValue,omitempty"`
@@ -461,13 +461,13 @@ type MetricMonitorParams struct {
 	Tolerance       *MetricMonitorParamsTolerance `json:"tolerance,omitempty"`
 
 	// TrainingPeriod Training period in milliseconds.
-	TrainingPeriod *float32                      `json:"trainingPeriod,omitempty"`
+	TrainingPeriod *float32                      `json:"trainingPeriod,omitempty" jsonschema:"Training period in milliseconds."`
 	MinDevFraction *float32                      `json:"minDevFraction,omitempty"`
 	MinDevValue    *float32                      `json:"minDevValue,omitempty"`
 	NullsMode      *MetricMonitorParamsNullsMode `json:"nullsMode,omitempty"`
 
 	// TimeOffset Time offset in milliseconds.
-	TimeOffset *float32 `json:"timeOffset,omitempty"`
+	TimeOffset *float32 `json:"timeOffset,omitempty" jsonschema:"Time offset in milliseconds."`
 }
 
 func (m MetricMonitorParams) Validate() error {
@@ -630,7 +630,7 @@ type FixedRepeatInterval struct {
 	Strategy FixedRepeatIntervalStrategy `json:"strategy" validate:"required"`
 
 	// Interval Fixed interval in milliseconds.
-	Interval float32 `json:"interval" validate:"required"`
+	Interval float32 `json:"interval" jsonschema:"Fixed interval in milliseconds." validate:"required"`
 }
 
 func (f FixedRepeatInterval) Validate() error {
@@ -653,10 +653,10 @@ type LinearRepeatInterval struct {
 	Strategy LinearRepeatIntervalStrategy `json:"strategy" validate:"required"`
 
 	// Min Minimum interval in milliseconds.
-	Min float32 `json:"min" validate:"required"`
+	Min float32 `json:"min" jsonschema:"Minimum interval in milliseconds." validate:"required"`
 
 	// Max Maximum interval in milliseconds.
-	Max float32 `json:"max" validate:"required"`
+	Max float32 `json:"max" jsonschema:"Maximum interval in milliseconds." validate:"required"`
 }
 
 func (l LinearRepeatInterval) Validate() error {
@@ -682,10 +682,10 @@ type ExponentialRepeatInterval struct {
 	Strategy ExponentialRepeatIntervalStrategy `json:"strategy" validate:"required"`
 
 	// Min Minimum interval in milliseconds.
-	Min float32 `json:"min" validate:"required"`
+	Min float32 `json:"min" jsonschema:"Minimum interval in milliseconds." validate:"required"`
 
 	// Max Maximum interval in milliseconds.
-	Max float32 `json:"max" validate:"required"`
+	Max float32 `json:"max" jsonschema:"Maximum interval in milliseconds." validate:"required"`
 }
 
 func (e ExponentialRepeatInterval) Validate() error {
@@ -717,7 +717,7 @@ type Monitor struct {
 	ChannelIds            []int         `json:"channelIds,omitempty"`
 
 	// RepeatInterval Monitor repeat interval configuration.
-	RepeatInterval *RepeatInterval `json:"repeatInterval,omitempty"`
+	RepeatInterval *RepeatInterval `json:"repeatInterval,omitempty" jsonschema:"Monitor repeat interval configuration."`
 	Params         map[string]any  `json:"params,omitempty"`
 	CreatedAt      *float32        `json:"createdAt,omitempty"`
 	UpdatedAt      *float32        `json:"updatedAt,omitempty"`
