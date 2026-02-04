@@ -14,7 +14,9 @@ mcp/
 │   └── bootstrap.go
 ├── tools/                  # MCP tool implementations
 │   ├── tools.go            # Register() for all tools
-│   └── greet.go            # Example greet tool
+│   ├── list_groups.go      # list_span_groups tool (UQL aggregation)
+│   ├── list_spans.go       # list_spans tool
+│   └── list_monitors.go    # list_monitors tool
 ├── uptraceapi/             # Generated Uptrace API client (do not edit)
 │   ├── client.go           # HTTP client methods
 │   ├── types.go            # API types and models
@@ -153,9 +155,10 @@ func Run(ctx context.Context, cmd *cli.Command, options ...fx.Option) error
 
 | Struct | Package | Fields |
 |--------|---------|--------|
-| `Config` | `appconf` | `Uptrace UptraceConfig` |
-| `UptraceConfig` | `appconf` | `DSN string` |
-| `GreetArgs` | `tools` | `Name string` |
+| `Config` | `appconf` | `Service ServiceConfig`, `Logging LoggingConfig`, `Uptrace UptraceConfig` |
+| `ServiceConfig` | `appconf` | `StartTimeout time.Duration`, `StopTimeout time.Duration` |
+| `LoggingConfig` | `appconf` | `Level string`, `MaxBodySize int` |
+| `UptraceConfig` | `appconf` | `DSN string`, `APIURL string`, `APIToken string`, `ProjectID int64` |
 
 ### Package-Level Variables
 
@@ -177,7 +180,9 @@ This server exposes the following MCP tools:
 
 | Tool Name | Description |
 |-----------|-------------|
-| `greet` | Say hello to someone (example tool) |
+| `list_span_groups` | Aggregate spans using UQL (Uptrace Query Language) |
+| `list_spans` | List spans from Uptrace for analyzing distributed traces |
+| `list_monitors` | List monitors (alerts) from Uptrace |
 
 ---
 
@@ -186,8 +191,18 @@ This server exposes the following MCP tools:
 Config file (`config.yaml`):
 
 ```yaml
+service:
+  start_timeout: 15s  # optional, default: 15s
+  stop_timeout: 15s   # optional, default: 15s
+
+logging:
+  level: info  # optional, default: info (debug, info, warn, error)
+
 uptrace:
   dsn: "https://<token>@api.uptrace.dev/<project_id>"
+  api_url: "https://api.uptrace.dev"
+  api_token: "<your-api-token>"
+  project_id: 1
 ```
 
 See `config.yaml.example` for reference.

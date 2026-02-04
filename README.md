@@ -109,16 +109,40 @@ Run the server separately and connect via HTTP. This is useful for:
 
 | Tool | Description |
 |------|-------------|
+| `list_span_groups` | Aggregate spans using UQL (Uptrace Query Language). Group and analyze spans by attributes. |
 | `list_spans` | List spans from Uptrace. Supports time range filtering, trace ID filtering, and pagination. |
 | `list_monitors` | List monitors from Uptrace. View configured alerts and monitoring rules. |
-| `greet` | Example greeting tool (for testing) |
+
+### list_span_groups
+
+Aggregate spans using UQL (Uptrace Query Language) for grouping and analysis.
+
+**Parameters:**
+- `time_start` (optional): Start time in RFC3339 format, defaults to 1 hour ago
+- `time_end` (optional): End time, defaults to now
+- `query` (optional): UQL query string
+- `search` (optional): Search filter
+- `duration_gte` (optional): Filter spans with duration >= value (nanoseconds)
+- `duration_lt` (optional): Filter spans with duration < value (nanoseconds)
+- `limit` (optional): Maximum number of groups to return (default: 100, max: 10000)
+
+**UQL query examples:**
+- `group by host_name` - group spans by hostname
+- `group by service_name` - group spans by service
+- `where _status_code = "error" | group by service_name` - group errors by service
+- `group by service_name | having count() > 100` - services with >100 spans
+- `where _dur_ms > 1s | group by _name` - slow operations
+
+**Example usage in Claude:**
+> "Group spans by service name"
+> "Show me error rates by host"
 
 ### list_spans
 
 Fetch spans from Uptrace for analyzing distributed traces.
 
 **Parameters:**
-- `time_start` (required): Start time in RFC3339 format or relative (e.g., `-1h`, `-30m`)
+- `time_start` (optional): Start time in RFC3339 format, defaults to 1 hour ago
 - `time_end` (optional): End time, defaults to now
 - `trace_id` (optional): Filter by specific trace ID
 - `limit` (optional): Maximum number of spans to return (default: 100)
@@ -131,7 +155,7 @@ Fetch spans from Uptrace for analyzing distributed traces.
 
 Fetch configured monitors (alerts) from Uptrace.
 
-**Parameters:** None
+**Parameters:** None (uses project_id from config)
 
 **Example usage in Claude:**
 > "List all monitors"
@@ -141,10 +165,14 @@ Fetch configured monitors (alerts) from Uptrace.
 
 | Field | Required | Description |
 |-------|----------|-------------|
+| `uptrace.dsn` | No | DSN connection string (alternative to individual fields) |
 | `uptrace.api_url` | Yes | Uptrace API URL |
 | `uptrace.api_token` | Yes | API token for authentication |
 | `uptrace.project_id` | Yes | Uptrace project ID |
 | `logging.level` | No | Log level: debug, info, warn, error (default: info) |
+| `logging.max_body_size` | No | Maximum body size for logging |
+| `service.start_timeout` | No | Service start timeout (default: 15s) |
+| `service.stop_timeout` | No | Service stop timeout (default: 15s) |
 
 ## Development
 
