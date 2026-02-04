@@ -3,7 +3,6 @@ package tools
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/uptrace/mcp/appconf"
@@ -47,39 +46,5 @@ func handleListMonitors(
 			IsError: true,
 		}, nil, nil
 	}
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "Monitors:\n")
-	for _, m := range resp.Monitors {
-		fmt.Fprintf(
-			&sb,
-			"- ID: %d\n  Name: %s\n  Type: %s\n  Status: %s\n  NotifyEveryoneByEmail: %v\n  TeamIds: %v\n  ChannelIds: %v\n",
-			m.ID,
-			m.Name,
-			m.Type,
-			m.Status,
-			m.NotifyEveryoneByEmail,
-			m.TeamIds,
-			m.ChannelIds,
-		)
-		if m.RepeatInterval != nil {
-			fmt.Fprintf(&sb, "  RepeatInterval: %+v\n", *m.RepeatInterval)
-		}
-		if len(m.Params) > 0 {
-			fmt.Fprintf(&sb, "  Params: %+v\n", m.Params)
-		}
-		if m.CreatedAt != nil {
-			fmt.Fprintf(&sb, "  CreatedAt: %f\n", *m.CreatedAt)
-		}
-		if m.UpdatedAt != nil {
-			fmt.Fprintf(&sb, "  UpdatedAt: %f\n", *m.UpdatedAt)
-		}
-		fmt.Fprint(&sb, "\n")
-	}
-
-	return &mcp.CallToolResult{
-		Content: []mcp.Content{
-			&mcp.TextContent{Text: sb.String()},
-		},
-	}, nil, nil
+	return nil, resp, nil
 }
