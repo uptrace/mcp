@@ -25,4 +25,5 @@ tasks:
     desc: Generate OpenAPI client bindings
     cmds:
       - rm -rf uptraceapi/
+      - go get -tool github.com/yorunikakeru4/oapi-codegen-dd/v3/cmd/oapi-codegen@latest
       - go run github.com/yorunikakeru4/oapi-codegen-dd/v3/cmd/oapi-codegen -config oapi-codegen.yaml openapi/openapi.yaml
