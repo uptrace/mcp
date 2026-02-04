@@ -9,7 +9,7 @@ import (
 
 // Register registers all MCP tools with the server.
 func Register(server *mcp.Server, client *uptraceapi.Client, conf *appconf.Config) {
-	registerGreetTool(server)
+	registerListSpanGroupsTool(server, client, conf)
 	registerListSpansTool(server, client, conf)
 	registerListMonitorsTool(server, client, conf)
 }
