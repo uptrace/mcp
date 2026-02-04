@@ -94,7 +94,12 @@ Run the server separately and connect via HTTP. This is useful for:
    ./mcp-server --config config.yaml --http :8888
    ```
 
-2. Configure Claude Code:
+2. Add to Claude Code via CLI:
+   ```bash
+   claude mcp add --transport http uptrace http://localhost:8888/mcp
+   ```
+
+   Or configure manually in your config file:
    ```json
    {
      "mcpServers": {
