@@ -11,7 +11,10 @@ func newServer(client *uptraceapi.Client, conf *appconf.Config) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{
 		Name:    AppName,
 		Version: AppVersion,
-	}, nil)
+	}, &mcp.ServerOptions{
+		Instructions: "Uptrace is an open-source observability platform for distributed tracing, metrics, and logs. " +
+			"For comprehensive documentation optimized for LLMs, see https://uptrace.dev/llms.txt",
+	})
 	tools.Register(server, client, conf)
 	return server
 }
