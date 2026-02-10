@@ -9,38 +9,46 @@ import (
 	"github.com/uptrace/mcp/uptraceapi"
 )
 
-type ListMonitorsTool struct {
+type GetDashboardTool struct {
 	client *uptraceapi.Client
 	conf   *appconf.Config
 }
 
-func NewListMonitorsTool(client *uptraceapi.Client, conf *appconf.Config) *ListMonitorsTool {
-	return &ListMonitorsTool{
+func NewGetDashboardTool(client *uptraceapi.Client, conf *appconf.Config) *GetDashboardTool {
+	return &GetDashboardTool{
 		client: client,
 		conf:   conf,
 	}
 }
 
-func (t *ListMonitorsTool) Register(server *mcp.Server) {
+func (t *GetDashboardTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "list_monitors",
 		Description: "List monitoring rules and alerts configured in Uptrace. " +
 			"Use to view alert configurations, check notification settings, understand monitoring thresholds. " +
-			"Documentation: https://uptrace.dev/llms.txt#features > 'Monitoring and Alerts Configuration'",
+			"Documentation: https://uptrace.dev/llms.txt#features > 'Dashboards'",
 	}, t.handler)
 }
 
-func (t ListMonitorsTool) handler(
+// NOTE: Essentially useless mcp endpoint, needed for CreateDashboardTool tests.
+func (t GetDashboardTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
-	input *uptraceapi.ListMonitorsRequestOptions,
+	input *uptraceapi.GetDashboardRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
 	if input.PathParams.ProjectID == nil {
-		input.PathParams = &uptraceapi.ListMonitorsPath{
-			ProjectID: &t.conf.Uptrace.ProjectID,
-		}
+		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
 	}
-	resp, err := t.client.ListMonitors(ctx, input)
+
+	if input.PathParams.DashboardID == 0 {
+		return &mcp.CallToolResult{
+			Content: []mcp.Content{
+				&mcp.TextContent{Text: "Error: DashboardID is required"},
+			},
+			IsError: true,
+		}, nil, nil
+	}
+	resp, err := t.client.GetDashboard(ctx, input)
 	if err != nil {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{

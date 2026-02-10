@@ -630,9 +630,10 @@ func (c *Client) ListDashboards(ctx context.Context, options *ListDashboardsRequ
 func (c *Client) CreateDashboardFromYAML(ctx context.Context, options *CreateDashboardFromYAMLRequestOptions, reqEditors ...runtime.RequestEditorFn) (*CreateDashboardFromYAMLResponse, error) {
 	var err error
 	reqParams := runtime.RequestOptionsParameters{
-		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/yaml",
-		Method:     "POST",
-		Options:    options,
+		RequestURL:  c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/yaml",
+		Method:      "POST",
+		Options:     options,
+		ContentType: "text/plain",
 	}
 
 	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)

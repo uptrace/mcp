@@ -202,13 +202,34 @@ uptrace:
   dsn: "https://<token>@api.uptrace.dev/<project_id>"
   api_url: "https://api.uptrace.dev"
   api_token: "<your-api-token>"
+default:
   project_id: 1
+  query: "<your-query>"
+  limit: 10
 ```
 
 See `config.yaml.example` for reference.
 
 ---
+## Creating Dashboards
 
+  Example YAML structure:
+  ```yaml
+  schema: v2
+  name: My Dashboard
+  tags: []
+  version: v25.04.20
+  grid_rows:
+    - title: General
+      items:
+        - title: Metric name
+          width: 12
+          height: 28
+          type: chart
+          metrics:
+            - metric_name as $var
+          query:
+            - sum($var)
 ## Development
 
 ```bash
