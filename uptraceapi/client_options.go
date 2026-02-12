@@ -529,7 +529,6 @@ func (o *ListDashboardsRequestOptions) GetHeader() (map[string]string, error) {
 // CreateDashboardFromYAMLRequestOptions is the options needed to make a request to CreateDashboardFromYAML.
 type CreateDashboardFromYAMLRequestOptions struct {
 	PathParams *CreateDashboardFromYAMLPath
-	Body       *CreateDashboardFromYAMLBody
 }
 
 // Validate validates all the fields in the options.
@@ -541,14 +540,6 @@ func (o *CreateDashboardFromYAMLRequestOptions) Validate() error {
 		if v, ok := any(o.PathParams).(runtime.Validator); ok {
 			if err := v.Validate(); err != nil {
 				errors = errors.Append("PathParams", err)
-			}
-		}
-	}
-
-	if o.Body != nil {
-		if v, ok := any(o.Body).(runtime.Validator); ok {
-			if err := v.Validate(); err != nil {
-				errors = errors.Append("Body", err)
 			}
 		}
 	}
@@ -571,7 +562,7 @@ func (o *CreateDashboardFromYAMLRequestOptions) GetQuery() (map[string]any, erro
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
 func (o *CreateDashboardFromYAMLRequestOptions) GetBody() any {
-	return o.Body
+	return nil
 }
 
 // GetHeader returns the headers as a map.

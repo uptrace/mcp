@@ -20,27 +20,43 @@ type RowID = int64
 
 type ListSpansPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListSpansPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type ListSpanGroupsPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListSpanGroupsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type ListMonitorsPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListMonitorsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type CreateMonitorPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (c CreateMonitorPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(c))
 }
 
 type GetMonitorPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// MonitorID Monitor ID.
 	MonitorID MonitorID `json:"monitor_id" jsonschema:"Monitor ID." validate:"required"`
@@ -52,7 +68,7 @@ func (g GetMonitorPath) Validate() error {
 
 type UpdateMonitorPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// MonitorID Monitor ID.
 	MonitorID MonitorID `json:"monitor_id" jsonschema:"Monitor ID." validate:"required"`
@@ -64,7 +80,7 @@ func (u UpdateMonitorPath) Validate() error {
 
 type DeleteMonitorPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// MonitorID Monitor ID.
 	MonitorID MonitorID `json:"monitor_id" jsonschema:"Monitor ID." validate:"required"`
@@ -76,17 +92,25 @@ func (d DeleteMonitorPath) Validate() error {
 
 type ListDashboardsPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListDashboardsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type CreateDashboardFromYAMLPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (c CreateDashboardFromYAMLPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(c))
 }
 
 type GetDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -98,7 +122,7 @@ func (g GetDashboardPath) Validate() error {
 
 type DeleteDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -110,7 +134,7 @@ func (d DeleteDashboardPath) Validate() error {
 
 type GetDashboardYAMLPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -122,7 +146,7 @@ func (g GetDashboardYAMLPath) Validate() error {
 
 type UpdateDashboardFromYAMLPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -134,7 +158,7 @@ func (u UpdateDashboardFromYAMLPath) Validate() error {
 
 type CloneDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -146,7 +170,7 @@ func (c CloneDashboardPath) Validate() error {
 
 type ResetDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -158,7 +182,7 @@ func (r ResetDashboardPath) Validate() error {
 
 type PinDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -170,7 +194,7 @@ func (p PinDashboardPath) Validate() error {
 
 type UnpinDashboardPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -182,7 +206,7 @@ func (u UnpinDashboardPath) Validate() error {
 
 type UpdateDashboardTablePath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -194,7 +218,7 @@ func (u UpdateDashboardTablePath) Validate() error {
 
 type UpdateDashboardGridPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -206,7 +230,7 @@ func (u UpdateDashboardGridPath) Validate() error {
 
 type CreateGridItemPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -218,7 +242,7 @@ func (c CreateGridItemPath) Validate() error {
 
 type UpdateGridItemPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -233,7 +257,7 @@ func (u UpdateGridItemPath) Validate() error {
 
 type DeleteGridItemPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -248,7 +272,7 @@ func (d DeleteGridItemPath) Validate() error {
 
 type CreateGridRowPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -260,7 +284,7 @@ func (c CreateGridRowPath) Validate() error {
 
 type UpdateGridRowPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -275,7 +299,7 @@ func (u UpdateGridRowPath) Validate() error {
 
 type DeleteGridRowPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -290,7 +314,7 @@ func (d DeleteGridRowPath) Validate() error {
 
 type MoveGridRowUpPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -305,7 +329,7 @@ func (m MoveGridRowUpPath) Validate() error {
 
 type MoveGridRowDownPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// DashboardID Dashboard ID.
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
@@ -320,17 +344,25 @@ func (m MoveGridRowDownPath) Validate() error {
 
 type ListNotificationChannelsPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListNotificationChannelsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
 type CreateNotificationChannelPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (c CreateNotificationChannelPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(c))
 }
 
 type GetNotificationChannelPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// ChannelID Notification channel ID.
 	ChannelID ChannelID `json:"channel_id" jsonschema:"Notification channel ID." validate:"required"`
@@ -342,7 +374,7 @@ func (g GetNotificationChannelPath) Validate() error {
 
 type UpdateNotificationChannelPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// ChannelID Notification channel ID.
 	ChannelID ChannelID `json:"channel_id" jsonschema:"Notification channel ID." validate:"required"`
@@ -354,7 +386,7 @@ func (u UpdateNotificationChannelPath) Validate() error {
 
 type DeleteNotificationChannelPath struct {
 	// ProjectID Uptrace project ID.
-	ProjectID *ProjectID `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
 	// ChannelID Notification channel ID.
 	ChannelID ChannelID `json:"channel_id" jsonschema:"Notification channel ID." validate:"required"`
