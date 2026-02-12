@@ -38,8 +38,8 @@ func (t *ListSpansTool) handler(
 	req *mcp.CallToolRequest,
 	input *uptraceapi.ListSpansRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
-	if input.PathParams.ProjectID == nil {
-		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
+	if input.PathParams.ProjectID == 0 {
+		input.PathParams.ProjectID = t.conf.Uptrace.ProjectID
 	}
 
 	if input.Query == nil {
