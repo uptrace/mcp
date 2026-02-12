@@ -11,9 +11,13 @@ import (
 type Config struct {
 	Service ServiceConfig `yaml:"service"`
 	Logging LoggingConfig `yaml:"logging"`
+	Default DefaultConfig `yaml:"default"`
 	Uptrace UptraceConfig `yaml:"uptrace"`
 }
-
+type DefaultConfig struct {
+	Limit int    `yaml:"limit"`
+	Query string `yaml:"query"`
+}
 type ServiceConfig struct {
 	StartTimeout time.Duration `yaml:"start_timeout"`
 	StopTimeout  time.Duration `yaml:"stop_timeout"`

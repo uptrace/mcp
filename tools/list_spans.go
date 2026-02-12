@@ -1,3 +1,4 @@
+// tools/list_spans.go
 package tools
 
 import (
@@ -6,66 +7,56 @@ import (
 	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-
 	"github.com/uptrace/mcp/appconf"
 	"github.com/uptrace/mcp/uptraceapi"
 )
 
-func registerListSpansTool(server *mcp.Server, client *uptraceapi.Client, conf *appconf.Config) {
-	mcp.AddTool(server, &mcp.Tool{
-		Name:        "list_spans",
-		Description: "List spans from Uptrace. Use to search and analyze distributed traces.",
-	}, makeListSpansHandler(client, conf))
+type ListSpansTool struct {
+	client *uptraceapi.Client
+	conf   *appconf.Config
 }
 
-func makeListSpansHandler(
-	client *uptraceapi.Client,
-	conf *appconf.Config,
-) mcp.ToolHandlerFor[*uptraceapi.ListSpansRequestOptions, any] {
-	return func(ctx context.Context, req *mcp.CallToolRequest, input *uptraceapi.ListSpansRequestOptions) (*mcp.CallToolResult, any, error) {
-		return handleListSpans(ctx, client, conf, input)
+func NewListSpansTool(client *uptraceapi.Client, conf *appconf.Config) *ListSpansTool {
+	return &ListSpansTool{
+		client: client,
+		conf:   conf,
 	}
 }
 
-func handleListSpans(
+func (t *ListSpansTool) Register(server *mcp.Server) {
+	mcp.AddTool(server, &mcp.Tool{
+		Name: "list_spans",
+		Description: "List spans from Uptrace for distributed tracing analysis. " +
+			"Spans represent individual operations in a trace. " +
+			"Use to search traces by trace_id, filter by time range, analyze service performance. " +
+			"Documentation: https://uptrace.dev/llms.txt#features > 'Querying Spans and Logs'",
+	}, t.handler)
+}
+
+func (t *ListSpansTool) handler(
 	ctx context.Context,
-	client *uptraceapi.Client,
-	conf *appconf.Config,
+	req *mcp.CallToolRequest,
 	input *uptraceapi.ListSpansRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
-	if input.PathParams.ProjectID == 0 {
-		input.PathParams.ProjectID = conf.Uptrace.ProjectID
+	if input.PathParams.ProjectID == nil {
+		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
 	}
 
-	// Дефолтные значения времени
-	var timeStart, timeEnd time.Time
-	if input.Query != nil {
-		timeStart = input.Query.TimeStart
-		timeEnd = input.Query.TimeEnd
+	if input.Query == nil {
+		input.Query = &uptraceapi.ListSpansQuery{}
 	}
-	if timeStart.IsZero() {
-		timeStart = time.Now().Add(-time.Hour)
+	if input.Query.TimeStart.IsZero() {
+		input.Query.TimeStart = time.Now().Add(-time.Hour)
 	}
-	if timeEnd.IsZero() {
-		timeEnd = time.Now()
+	if input.Query.TimeEnd.IsZero() {
+		input.Query.TimeEnd = time.Now()
 	}
-
-	limit := uptraceapi.Limit(100)
-	if input.Query != nil && input.Query.Limit != nil {
-		limit = *input.Query.Limit
+	if input.Query.Limit == nil {
+		defaultLimit := uptraceapi.Limit(t.conf.Default.Limit)
+		input.Query.Limit = &defaultLimit
 	}
 
-	opts := &uptraceapi.ListSpansRequestOptions{
-		PathParams: input.PathParams,
-		Query: &uptraceapi.ListSpansQuery{
-			TimeStart: timeStart,
-			TimeEnd:   timeEnd,
-			TraceID:   input.Query.TraceID,
-			Limit:     &limit,
-		},
-	}
-
-	resp, err := client.ListSpans(ctx, opts)
+	resp, err := t.client.ListSpans(ctx, input)
 	if err != nil {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{

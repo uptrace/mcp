@@ -10,91 +10,54 @@ import (
 	"github.com/uptrace/mcp/uptraceapi"
 )
 
-func registerListSpanGroupsTool(
-	server *mcp.Server,
-	client *uptraceapi.Client,
-	conf *appconf.Config,
-) {
+type ListSpanGroupsTool struct {
+	client *uptraceapi.Client
+	conf   *appconf.Config
+}
+
+func NewListSpanGroupsTool(client *uptraceapi.Client, conf *appconf.Config) *ListSpanGroupsTool {
+	return &ListSpanGroupsTool{
+		client: client,
+		conf:   conf,
+	}
+}
+
+func (t *ListSpanGroupsTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "list_span_groups",
-		Description: `Aggregate spans using UQL (Uptrace Query Language).
-
-Use this tool to group and analyze spans by attributes like host_name, service_name, etc.
-
-UQL query examples:
-- "group by host_name" - group spans by hostname
-- "group by service_name" - group spans by service
-- "where _status_code = \"error\" | group by service_name" - group errors by service
-- "group by service_name | having count() > 100" - services with >100 spans
-- "where _dur_ms > 1s | group by _name" - slow operations
-`,
-	}, makeListSpanGroupsHandler(client, conf))
+		Description: "List grouped spans to analyze operation patterns and performance bottlenecks. " +
+			"Span groups aggregate similar operations together for better analysis. " +
+			"Documentation: https://uptrace.dev/llms.txt#features > 'Grouping similar spans and events together'",
+	}, t.handler)
 }
 
-func makeListSpanGroupsHandler(
-	client *uptraceapi.Client,
-	conf *appconf.Config,
-) mcp.ToolHandlerFor[*uptraceapi.ListSpanGroupsRequestOptions, any] {
-	return func(ctx context.Context, req *mcp.CallToolRequest, input *uptraceapi.ListSpanGroupsRequestOptions) (*mcp.CallToolResult, any, error) {
-		return handleListSpanGroups(ctx, client, conf, input)
-	}
-}
-
-func handleListSpanGroups(
+func (t *ListSpanGroupsTool) handler(
 	ctx context.Context,
-	client *uptraceapi.Client,
-	conf *appconf.Config,
+	req *mcp.CallToolRequest,
 	input *uptraceapi.ListSpanGroupsRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
-	timeStart := input.Query.TimeStart
-	if timeStart.IsZero() {
-		timeStart = time.Now().Add(-time.Hour)
-	}
-	timeEnd := input.Query.TimeEnd
-	if timeEnd.IsZero() {
-		timeEnd = time.Now()
+	if input.PathParams.ProjectID == nil {
+		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
 	}
 
-	limit := uptraceapi.Limit(100)
-	if input.Query.Limit != nil {
-		limit = min(*input.Query.Limit, 10000)
+	if input.Query == nil {
+		input.Query = &uptraceapi.ListSpanGroupsQuery{}
+	}
+	if input.Query.TimeStart.IsZero() {
+		input.Query.TimeStart = time.Now().Add(-time.Hour)
+	}
+	if input.Query.TimeEnd.IsZero() {
+		input.Query.TimeEnd = time.Now()
+	}
+	if input.Query.Limit == nil {
+		defaultLimit := uptraceapi.Limit(t.conf.Default.Limit)
+		input.Query.Limit = &defaultLimit
+	}
+	if input.Query.Query == nil {
+		input.Query.Query = &t.conf.Default.Query
 	}
 
-	var query string
-	if input.Query.Query != nil {
-		query = *input.Query.Query
-	}
-
-	var search *string
-	if input.Query.Search != nil {
-		search = input.Query.Search
-	}
-
-	var durationGte *int64
-	if input.Query.DurationGte != nil && *input.Query.DurationGte > 0 {
-		durationGte = input.Query.DurationGte
-	}
-	var durationLt *int64
-	if input.Query.DurationLt != nil && *input.Query.DurationLt > 0 {
-		durationLt = input.Query.DurationLt
-	}
-
-	opts := &uptraceapi.ListSpanGroupsRequestOptions{
-		PathParams: &uptraceapi.ListSpanGroupsPath{
-			ProjectID: conf.Uptrace.ProjectID,
-		},
-		Query: &uptraceapi.ListSpanGroupsQuery{
-			TimeStart:   timeStart,
-			TimeEnd:     timeEnd,
-			Query:       &query,
-			Limit:       &limit,
-			Search:      search,
-			DurationGte: durationGte,
-			DurationLt:  durationLt,
-		},
-	}
-
-	resp, err := client.ListSpanGroups(ctx, opts)
+	resp, err := t.client.ListSpanGroups(ctx, input)
 	if err != nil {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{

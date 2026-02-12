@@ -6,11 +6,13 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/urfave/cli/v3"
 	"go.uber.org/fx"
 
 	"github.com/uptrace/mcp/appconf"
 	"github.com/uptrace/mcp/bootstrap"
+	"github.com/uptrace/mcp/tools"
 	"github.com/uptrace/mcp/uptraceapi"
 )
 
@@ -41,13 +43,16 @@ func main() {
 				ctx,
 				cmd,
 				fx.Provide(bootstrap.NewUptraceClient),
+				fx.Provide(bootstrap.NewServer),
+				tools.Module,
 				fx.Invoke(func(
 					ctx context.Context,
 					logger *slog.Logger,
 					client *uptraceapi.Client,
 					conf *appconf.Config,
+					server *mcp.Server,
 				) error {
-					return bootstrap.RunServer(ctx, logger, client, conf, cmd)
+					return bootstrap.RunServer(ctx, logger, client, conf, server, cmd)
 				}),
 			)
 		},

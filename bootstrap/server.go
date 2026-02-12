@@ -16,22 +16,21 @@ func RunServer(
 	logger *slog.Logger,
 	client *uptraceapi.Client,
 	conf *appconf.Config,
+	server *mcp.Server,
 	cmd *cli.Command,
 ) error {
 	if cmd.String("http") != "" {
-		return runHTTPServer(ctx, logger, client, conf, cmd)
+		return runHTTPServer(ctx, logger, server, conf, cmd)
 	}
-	return runStdioServer(ctx, logger, client, conf, cmd)
+	return runStdioServer(ctx, logger, server, cmd)
 }
 
 func runStdioServer(
 	ctx context.Context,
 	logger *slog.Logger,
-	client *uptraceapi.Client,
-	conf *appconf.Config,
+	server *mcp.Server,
 	cmd *cli.Command,
 ) error {
-	server := newServer(client, conf)
 	debug := cmd.Bool("debug")
 
 	logger.Info("starting MCP server (stdio)",
@@ -51,7 +50,7 @@ func runStdioServer(
 func runHTTPServer(
 	ctx context.Context,
 	logger *slog.Logger,
-	client *uptraceapi.Client,
+	mcpServer *mcp.Server,
 	conf *appconf.Config,
 	cmd *cli.Command,
 ) error {
@@ -59,7 +58,7 @@ func runHTTPServer(
 	debug := cmd.Bool("debug")
 
 	var handler http.Handler = mcp.NewStreamableHTTPHandler(func(r *http.Request) *mcp.Server {
-		return newServer(client, conf)
+		return mcpServer
 	}, nil)
 
 	if debug {
@@ -88,4 +87,3 @@ func runHTTPServer(
 	}
 	return nil
 }
-
