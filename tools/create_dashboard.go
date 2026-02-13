@@ -3,14 +3,16 @@ package tools
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/uptrace/mcp/appconf"
 	"github.com/uptrace/mcp/uptraceapi"
+	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
 
-// WARNING: More information about creating dashboards is needed; the current documentation is insufficient.
 type CreateDashboardTool struct {
 	client *uptraceapi.Client
 	conf   *appconf.Config
@@ -33,16 +35,22 @@ func (t *CreateDashboardTool) Register(server *mcp.Server) {
 	}, t.handler)
 }
 
+type createDashboardInput struct {
+	ProjectID int64  `json:"project_id,omitempty" jsonschema:"Uptrace project ID."`
+	Body      string `json:"body" jsonschema:"YAML dashboard definition." validate:"required"`
+}
+
 func (t *CreateDashboardTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
-	input *uptraceapi.CreateDashboardFromYAMLRequestOptions,
+	input *createDashboardInput,
 ) (*mcp.CallToolResult, any, error) {
-	if input.PathParams.ProjectID == nil {
-		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
+	projectID := input.ProjectID
+	if projectID == 0 {
+		projectID = t.conf.Uptrace.ProjectID
 	}
 
-	if input.Body == nil {
+	if input.Body == "" {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{
 				&mcp.TextContent{Text: "YAML dashboard definition is required"},
@@ -50,10 +58,10 @@ func (t *CreateDashboardTool) handler(
 			IsError: true,
 		}, nil, nil
 	}
-	if !strings.Contains(*input.Body, "schema:") ||
-		!strings.Contains(*input.Body, "name") ||
-		!strings.Contains(*input.Body, "version") ||
-		!strings.Contains(*input.Body, "tags") {
+	if !strings.Contains(input.Body, "schema:") ||
+		!strings.Contains(input.Body, "name") ||
+		!strings.Contains(input.Body, "version") ||
+		!strings.Contains(input.Body, "tags") {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{
 				&mcp.TextContent{
@@ -63,7 +71,22 @@ func (t *CreateDashboardTool) handler(
 			IsError: true,
 		}, nil, nil
 	}
-	resp, err := t.client.CreateDashboardFromYAML(ctx, input)
+
+	opts := &uptraceapi.CreateDashboardFromYAMLRequestOptions{
+		PathParams: &uptraceapi.CreateDashboardFromYAMLPath{
+			ProjectID: projectID,
+		},
+	}
+
+	yamlBody := input.Body
+	setBody := func(_ context.Context, req *http.Request) error {
+		req.Body = io.NopCloser(strings.NewReader(yamlBody))
+		req.ContentLength = int64(len(yamlBody))
+		req.Header.Set("Content-Type", "application/yaml")
+		return nil
+	}
+
+	resp, err := t.client.CreateDashboardFromYAML(ctx, opts, runtime.RequestEditorFn(setBody))
 	if err != nil {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{

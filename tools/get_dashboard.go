@@ -23,21 +23,23 @@ func NewGetDashboardTool(client *uptraceapi.Client, conf *appconf.Config) *GetDa
 
 func (t *GetDashboardTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
-		Name: "list_monitors",
-		Description: "List monitoring rules and alerts configured in Uptrace. " +
-			"Use to view alert configurations, check notification settings, understand monitoring thresholds. " +
+		Name: "get_dashboard",
+		Description: "Get a dashboard by ID from Uptrace. " +
+			"Use to retrieve dashboard details including grid rows and items. " +
 			"Documentation: https://uptrace.dev/llms.txt#features > 'Dashboards'",
 	}, t.handler)
 }
 
-// NOTE: Essentially useless mcp endpoint, needed for CreateDashboardTool tests.
-func (t GetDashboardTool) handler(
+func (t *GetDashboardTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *uptraceapi.GetDashboardRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
-	if input.PathParams.ProjectID == nil {
-		input.PathParams.ProjectID = &t.conf.Uptrace.ProjectID
+	if input.PathParams == nil || input.PathParams.ProjectID == 0 {
+		if input.PathParams == nil {
+			input.PathParams = &uptraceapi.GetDashboardPath{}
+		}
+		input.PathParams.ProjectID = t.conf.Uptrace.ProjectID
 	}
 
 	if input.PathParams.DashboardID == 0 {

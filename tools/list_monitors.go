@@ -35,9 +35,9 @@ func (t ListMonitorsTool) handler(
 	req *mcp.CallToolRequest,
 	input *uptraceapi.ListMonitorsRequestOptions,
 ) (*mcp.CallToolResult, any, error) {
-	if input.PathParams.ProjectID == nil {
+	if input.PathParams == nil || input.PathParams.ProjectID == 0 {
 		input.PathParams = &uptraceapi.ListMonitorsPath{
-			ProjectID: &t.conf.Uptrace.ProjectID,
+			ProjectID: t.conf.Uptrace.ProjectID,
 		}
 	}
 	resp, err := t.client.ListMonitors(ctx, input)
