@@ -2,7 +2,6 @@ package tools
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/uptrace/mcp/appconf"
@@ -24,8 +23,17 @@ func NewListDashboardsTool(client *uptraceapi.Client, conf *appconf.Config) *Lis
 func (t *ListDashboardsTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "list_dashboards",
+		Annotations: &mcp.ToolAnnotations{
+			Title:          "List dashboards",
+			ReadOnlyHint:   true,
+			IdempotentHint: true,
+			OpenWorldHint:  boolPtr(true),
+		},
 		Description: "List dashboards configured in Uptrace. " +
-			"Use to view available dashboards for monitoring and visualization. " +
+			"Use this to browse available dashboards for monitoring and visualization. " +
+			"Returns dashboard summaries with ID, name, and tags. " +
+			"Use get_dashboard with a specific ID to retrieve full dashboard details including grid rows and items. " +
+			"Use create_dashboard to create a new dashboard from YAML. " +
 			"Documentation: https://uptrace.dev/llms.txt#features > 'Dashboards'",
 	}, t.handler)
 }
@@ -34,7 +42,7 @@ func (t *ListDashboardsTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *uptraceapi.ListDashboardsRequestOptions,
-) (*mcp.CallToolResult, any, error) {
+) (*mcp.CallToolResult, *uptraceapi.ListDashboardsResponse, error) {
 	if input.PathParams == nil || input.PathParams.ProjectID == 0 {
 		input.PathParams = &uptraceapi.ListDashboardsPath{
 			ProjectID: t.conf.Uptrace.ProjectID,
@@ -42,12 +50,7 @@ func (t *ListDashboardsTool) handler(
 	}
 	resp, err := t.client.ListDashboards(ctx, input)
 	if err != nil {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("Error: %v", err)},
-			},
-			IsError: true,
-		}, nil, nil
+		return nil, nil, err
 	}
 	return nil, resp, nil
 }

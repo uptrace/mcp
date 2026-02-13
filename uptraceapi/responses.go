@@ -14,13 +14,111 @@ type InternalError = Error
 
 type CreateAnnotationErrorResponse = BadRequest
 
-type ListSpansResponse map[string]any
+type PublicListSpansResponse struct {
+	// Spans Array of span objects.
+	Spans []Span `json:"spans" jsonschema:"Array of span objects." validate:"required"`
+
+	// HasMore Whether more results exist beyond the limit.
+	HasMore *bool `json:"hasMore,omitempty" jsonschema:"Whether more results exist beyond the limit."`
+}
+
+type PublicListSpansErrorResponse = BadRequest
+
+type PublicListSpanGroupsResponse struct {
+	// Groups Array of group rows with dynamic columns based on the query.
+	Groups []map[string]any `json:"groups" jsonschema:"Array of group rows with dynamic columns based on the query." validate:"required"`
+
+	// HasMore Whether more results exist beyond the limit.
+	HasMore *bool `json:"hasMore,omitempty" jsonschema:"Whether more results exist beyond the limit."`
+}
+
+type PublicListSpanGroupsErrorResponse = BadRequest
+
+type ListSpansResponse struct {
+	// Spans Array of span objects.
+	Spans []Span `json:"spans" jsonschema:"Array of span objects." validate:"required"`
+
+	// Count Total count of matching spans.
+	Count int64 `json:"count" jsonschema:"Total count of matching spans." validate:"required"`
+
+	// Query Parsed query parts with error state.
+	Query []map[string]any `json:"query,omitempty" jsonschema:"Parsed query parts with error state."`
+
+	// Order Applied sorting configuration.
+	Order []OrderItem `json:"order,omitempty" jsonschema:"Applied sorting configuration."`
+
+	// Search Applied search matchers.
+	Search []map[string]any `json:"search,omitempty" jsonschema:"Applied search matchers."`
+
+	// WhereAttrs Map of WHERE attribute names to their matched values.
+	WhereAttrs map[string]any `json:"whereAttrs,omitempty" jsonschema:"Map of WHERE attribute names to their matched values."`
+}
 
 type ListSpansErrorResponse = BadRequest
 
-type ListSpanGroupsResponse map[string]any
+// ListSpanGroupsResponse Result of a span group aggregation query.
+type ListSpanGroupsResponse = GroupsResult
 
 type ListSpanGroupsErrorResponse = BadRequest
+
+type QueryTimeseriesResponse struct {
+	// Groups Array of group rows. Aggregated columns contain arrays of float values aligned with the time array.
+	Groups []map[string]any `json:"groups" jsonschema:"Array of group rows. Aggregated columns contain arrays of float values aligned with the time array." validate:"required"`
+
+	// Columns Column definitions for the result.
+	Columns []QueryColumn `json:"columns,omitempty" jsonschema:"Column definitions for the result."`
+
+	// Time Array of aligned timestamps as unix milliseconds.
+	Time []float64 `json:"time" jsonschema:"Array of aligned timestamps as unix milliseconds." validate:"required"`
+
+	// Interval Time interval between data points in milliseconds.
+	Interval int64 `json:"interval" jsonschema:"Time interval between data points in milliseconds." validate:"required"`
+
+	// Query Parsed query parts with error state.
+	Query []map[string]any `json:"query,omitempty" jsonschema:"Parsed query parts with error state."`
+
+	// Order Applied sorting configuration.
+	Order []OrderItem `json:"order,omitempty" jsonschema:"Applied sorting configuration."`
+
+	// WhereAttrs Map of WHERE attribute names to their matched values.
+	WhereAttrs map[string]any `json:"whereAttrs,omitempty" jsonschema:"Map of WHERE attribute names to their matched values."`
+}
+
+type QueryTimeseriesErrorResponse = BadRequest
+
+type QueryQuantilesResponse struct {
+	// Timeseries Array of named timeseries. Names include: count, countPerMin, errorCount, errorCountPerMin, durationP50, durationP90, durationP99, durationMax.
+	Timeseries []Timeseries `json:"timeseries" jsonschema:"Array of named timeseries. Names include: count, countPerMin, errorCount, errorCountPerMin, durationP50, durationP90, durationP99, durationMax." validate:"required"`
+}
+
+type QueryQuantilesErrorResponse = BadRequest
+
+// ListTraceGroupsResponse Result of a span group aggregation query.
+type ListTraceGroupsResponse = GroupsResult
+
+type ListTraceGroupsErrorResponse = BadRequest
+
+type ListTracesResponse struct {
+	// Spans Root spans for matching traces.
+	Spans []Span `json:"spans" jsonschema:"Root spans for matching traces." validate:"required"`
+
+	// Count Total count of matching traces.
+	Count int64 `json:"count" jsonschema:"Total count of matching traces." validate:"required"`
+
+	// Query Parsed query parts with error state.
+	Query []map[string]any `json:"query,omitempty" jsonschema:"Parsed query parts with error state."`
+
+	// Order Applied sorting configuration.
+	Order []OrderItem `json:"order,omitempty" jsonschema:"Applied sorting configuration."`
+
+	// Search Applied search matchers.
+	Search []map[string]any `json:"search,omitempty" jsonschema:"Applied search matchers."`
+
+	// WhereAttrs Map of WHERE attribute names to their matched values.
+	WhereAttrs map[string]any `json:"whereAttrs,omitempty" jsonschema:"Map of WHERE attribute names to their matched values."`
+}
+
+type ListTracesErrorResponse = BadRequest
 
 type SyncFixturesErrorResponse = BadRequest
 

@@ -34,11 +34,29 @@ type ClientInterface interface {
 	// CreateAnnotation Create annotation
 	CreateAnnotation(ctx context.Context, options *CreateAnnotationRequestOptions, reqEditors ...runtime.RequestEditorFn) (*struct{}, error)
 
+	// PublicListSpans List spans
+	PublicListSpans(ctx context.Context, options *PublicListSpansRequestOptions, reqEditors ...runtime.RequestEditorFn) (*PublicListSpansResponse, error)
+
+	// PublicListSpanGroups List groups
+	PublicListSpanGroups(ctx context.Context, options *PublicListSpanGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*PublicListSpanGroupsResponse, error)
+
 	// ListSpans List spans
 	ListSpans(ctx context.Context, options *ListSpansRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListSpansResponse, error)
 
 	// ListSpanGroups List groups
 	ListSpanGroups(ctx context.Context, options *ListSpanGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListSpanGroupsResponse, error)
+
+	// QueryTimeseries Timeseries
+	QueryTimeseries(ctx context.Context, options *QueryTimeseriesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*QueryTimeseriesResponse, error)
+
+	// QueryQuantiles Quantiles
+	QueryQuantiles(ctx context.Context, options *QueryQuantilesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*QueryQuantilesResponse, error)
+
+	// ListTraceGroups List trace groups
+	ListTraceGroups(ctx context.Context, options *ListTraceGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListTraceGroupsResponse, error)
+
+	// ListTraces List traces
+	ListTraces(ctx context.Context, options *ListTracesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListTracesResponse, error)
 
 	// SyncFixtures Sync fixtures
 	SyncFixtures(ctx context.Context, options *SyncFixturesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*struct{}, error)
@@ -182,11 +200,99 @@ func (c *Client) CreateAnnotation(ctx context.Context, options *CreateAnnotation
 	return responseParser(ctx, resp)
 }
 
+// PublicListSpans List spans
+func (c *Client) PublicListSpans(ctx context.Context, options *PublicListSpansRequestOptions, reqEditors ...runtime.RequestEditorFn) (*PublicListSpansResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/api/v1/tracing/{project_id}/spans",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*PublicListSpansResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(PublicListSpansErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(PublicListSpansResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/api/v1/tracing/{project_id}/spans")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// PublicListSpanGroups List groups
+func (c *Client) PublicListSpanGroups(ctx context.Context, options *PublicListSpanGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*PublicListSpanGroupsResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/api/v1/tracing/{project_id}/groups",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*PublicListSpanGroupsResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(PublicListSpanGroupsErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(PublicListSpanGroupsResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/api/v1/tracing/{project_id}/groups")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
 // ListSpans List spans
 func (c *Client) ListSpans(ctx context.Context, options *ListSpansRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListSpansResponse, error) {
 	var err error
 	reqParams := runtime.RequestOptionsParameters{
-		RequestURL: c.apiClient.GetBaseURL() + "/api/v1/tracing/{project_id}/spans",
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/spans",
 		Method:     "GET",
 		Options:    options,
 	}
@@ -219,7 +325,7 @@ func (c *Client) ListSpans(ctx context.Context, options *ListSpansRequestOptions
 		return target, nil
 	}
 
-	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/api/v1/tracing/{project_id}/spans")
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/spans")
 	if err != nil {
 		return nil, fmt.Errorf("error executing request: %w", err)
 	}
@@ -230,7 +336,7 @@ func (c *Client) ListSpans(ctx context.Context, options *ListSpansRequestOptions
 func (c *Client) ListSpanGroups(ctx context.Context, options *ListSpanGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListSpanGroupsResponse, error) {
 	var err error
 	reqParams := runtime.RequestOptionsParameters{
-		RequestURL: c.apiClient.GetBaseURL() + "/api/v1/tracing/{project_id}/groups",
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/groups",
 		Method:     "GET",
 		Options:    options,
 	}
@@ -263,7 +369,183 @@ func (c *Client) ListSpanGroups(ctx context.Context, options *ListSpanGroupsRequ
 		return target, nil
 	}
 
-	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/api/v1/tracing/{project_id}/groups")
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/groups")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// QueryTimeseries Timeseries
+func (c *Client) QueryTimeseries(ctx context.Context, options *QueryTimeseriesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*QueryTimeseriesResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/timeseries",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*QueryTimeseriesResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(QueryTimeseriesErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(QueryTimeseriesResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/timeseries")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// QueryQuantiles Quantiles
+func (c *Client) QueryQuantiles(ctx context.Context, options *QueryQuantilesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*QueryQuantilesResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/quantiles",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*QueryQuantilesResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(QueryQuantilesErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(QueryQuantilesResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/quantiles")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// ListTraceGroups List trace groups
+func (c *Client) ListTraceGroups(ctx context.Context, options *ListTraceGroupsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListTraceGroupsResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/trace-groups",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ListTraceGroupsResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ListTraceGroupsErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ListTraceGroupsResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/trace-groups")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// ListTraces List traces
+func (c *Client) ListTraces(ctx context.Context, options *ListTracesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListTracesResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/tracing/{project_id}/traces",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ListTracesResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ListTracesErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ListTracesResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/tracing/{project_id}/traces")
 	if err != nil {
 		return nil, fmt.Errorf("error executing request: %w", err)
 	}

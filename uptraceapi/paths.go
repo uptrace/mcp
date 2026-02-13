@@ -18,6 +18,24 @@ type GridItemID = int64
 
 type RowID = int64
 
+type PublicListSpansPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (p PublicListSpansPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(p))
+}
+
+type PublicListSpanGroupsPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (p PublicListSpanGroupsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(p))
+}
+
 type ListSpansPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
@@ -33,6 +51,42 @@ type ListSpanGroupsPath struct {
 }
 
 func (l ListSpanGroupsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type QueryTimeseriesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (q QueryTimeseriesPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(q))
+}
+
+type QueryQuantilesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (q QueryQuantilesPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(q))
+}
+
+type ListTraceGroupsPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListTraceGroupsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type ListTracesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListTracesPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 

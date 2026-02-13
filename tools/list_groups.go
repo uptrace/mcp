@@ -2,7 +2,6 @@ package tools
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -25,9 +24,22 @@ func NewListSpanGroupsTool(client *uptraceapi.Client, conf *appconf.Config) *Lis
 func (t *ListSpanGroupsTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "list_span_groups",
-		Description: "List grouped spans to analyze operation patterns and performance bottlenecks. " +
-			"Span groups aggregate similar operations together for better analysis. " +
-			"Documentation: https://uptrace.dev/llms.txt#features > 'Grouping similar spans and events together'",
+		Annotations: &mcp.ToolAnnotations{
+			Title:          "List span groups",
+			ReadOnlyHint:   true,
+			IdempotentHint: true,
+			OpenWorldHint:  boolPtr(true),
+		},
+		Description: "Aggregate spans into groups using UQL queries. " +
+			"Use this to get aggregated metrics like request count, error rate, or latency percentiles. " +
+			"Aggregate functions: count(), avg(), sum(), min(), max(), p50(), p75(), p90(), p99(), uniq(), apdex(). " +
+			"Supports GROUP BY (e.g. group by service_name), HAVING (e.g. having p50(_dur_ms) > 100ms), " +
+			"WHERE filters, full-text search, system filtering (e.g. httpserver:all, db:postgresql), " +
+			"and duration filtering. Example query: 'perMin(count()) | group by host_name'. " +
+			"Returns grouped rows with dynamic columns based on the query. " +
+			"Use list_spans instead when you need individual span details. " +
+			"Use timeseries instead when you need time-bucketed data for charts. " +
+			"Documentation: https://uptrace.dev/features/querying/grouping",
 	}, t.handler)
 }
 
@@ -35,7 +47,7 @@ func (t *ListSpanGroupsTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *uptraceapi.ListSpanGroupsRequestOptions,
-) (*mcp.CallToolResult, any, error) {
+) (*mcp.CallToolResult, *uptraceapi.ListSpanGroupsResponse, error) {
 	if input.PathParams.ProjectID == 0 {
 		input.PathParams.ProjectID = t.conf.Uptrace.ProjectID
 	}
@@ -43,11 +55,11 @@ func (t *ListSpanGroupsTool) handler(
 	if input.Query == nil {
 		input.Query = &uptraceapi.ListSpanGroupsQuery{}
 	}
-	if input.Query.TimeStart.IsZero() {
-		input.Query.TimeStart = time.Now().Add(-time.Hour)
+	if input.Query.TimeGte.IsZero() {
+		input.Query.TimeGte = time.Now().Add(-time.Hour)
 	}
-	if input.Query.TimeEnd.IsZero() {
-		input.Query.TimeEnd = time.Now()
+	if input.Query.TimeLt.IsZero() {
+		input.Query.TimeLt = time.Now()
 	}
 	if input.Query.Limit == nil {
 		defaultLimit := uptraceapi.Limit(t.conf.Default.Limit)
@@ -59,12 +71,7 @@ func (t *ListSpanGroupsTool) handler(
 
 	resp, err := t.client.ListSpanGroups(ctx, input)
 	if err != nil {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("Error listing span groups: %v", err)},
-			},
-			IsError: true,
-		}, nil, nil
+		return nil, nil, err
 	}
 
 	return nil, resp, nil

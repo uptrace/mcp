@@ -11,6 +11,224 @@ import (
 	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
 
+type OrderItem struct {
+	Key   *string         `json:"key,omitempty"`
+	Order *OrderItemOrder `json:"order,omitempty"`
+}
+
+func (o OrderItem) Validate() error {
+	var errors runtime.ValidationErrors
+	if o.Order != nil {
+		if v, ok := any(o.Order).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("Order", err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+// Span A span representing an individual operation in a distributed trace.
+type Span struct {
+	// ID Span ID (hex-encoded).
+	ID string `json:"id" jsonschema:"Span ID (hex-encoded)." validate:"required"`
+
+	// ParentID Parent span ID (hex-encoded, empty for root spans).
+	ParentID *string `json:"parentId,omitempty" jsonschema:"Parent span ID (hex-encoded, empty for root spans)."`
+
+	// TraceID Trace ID (hex-encoded).
+	TraceID string `json:"traceId" jsonschema:"Trace ID (hex-encoded)." validate:"required"`
+
+	// Standalone Whether the span is standalone (not part of a trace).
+	Standalone *bool `json:"standalone,omitempty" jsonschema:"Whether the span is standalone (not part of a trace)."`
+
+	// ProjectID Project ID.
+	ProjectID *uint32 `json:"projectId,omitempty" jsonschema:"Project ID."`
+
+	// GroupID Group ID (uint64 as string).
+	GroupID *string `json:"groupId,omitempty" jsonschema:"Group ID (uint64 as string)."`
+
+	// Type Telemetry type (spans, events, logs, funcs).
+	Type *string `json:"type,omitempty" jsonschema:"Telemetry type (spans, events, logs, funcs)."`
+
+	// System Detected system (e.g., httpserver:all, db:postgresql, log:error).
+	System *string `json:"system,omitempty" jsonschema:"Detected system (e.g., httpserver:all, db:postgresql, log:error)."`
+
+	// Kind Span kind (client, server, producer, consumer, internal).
+	Kind *string `json:"kind,omitempty" jsonschema:"Span kind (client, server, producer, consumer, internal)."`
+
+	// Name Span name.
+	Name string `json:"name" jsonschema:"Span name." validate:"required"`
+
+	// EventName Event name (for event spans).
+	EventName *string `json:"eventName,omitempty" jsonschema:"Event name (for event spans)."`
+
+	// DisplayName Human-readable operation summary.
+	DisplayName *string `json:"displayName,omitempty" jsonschema:"Human-readable operation summary."`
+
+	// Time Span start time as unix milliseconds.
+	Time float64 `json:"time" jsonschema:"Span start time as unix milliseconds." validate:"required"`
+
+	// Duration Duration in milliseconds.
+	Duration float64 `json:"duration" jsonschema:"Duration in milliseconds." validate:"required"`
+
+	// StatusCode Status code (ok, error, unset).
+	StatusCode string `json:"statusCode" jsonschema:"Status code (ok, error, unset)." validate:"required"`
+
+	// StatusMessage Optional status message.
+	StatusMessage *string `json:"statusMessage,omitempty" jsonschema:"Optional status message."`
+
+	// Attrs Span attributes as key-value map. Keys include type suffix (e.g., service_name::str, count::int).
+	Attrs map[string]any `json:"attrs,omitempty" jsonschema:"Span attributes as key-value map. Keys include type suffix (e.g., service_name::str, count::int)."`
+
+	// Events Child event spans.
+	Events []map[string]any `json:"events,omitempty" jsonschema:"Child event spans."`
+
+	// Logs Child log spans.
+	Logs []map[string]any `json:"logs,omitempty" jsonschema:"Child log spans."`
+
+	// Links Span links to other spans.
+	Links *Span_Links `json:"links,omitempty" jsonschema:"Span links to other spans."`
+}
+
+func (s Span) Validate() error {
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(s.ID, "required"); err != nil {
+		errors = errors.Append("ID", err)
+	}
+	if err := typesValidator.Var(s.TraceID, "required"); err != nil {
+		errors = errors.Append("TraceID", err)
+	}
+	if err := typesValidator.Var(s.Name, "required"); err != nil {
+		errors = errors.Append("Name", err)
+	}
+	if err := typesValidator.Var(s.Time, "required"); err != nil {
+		errors = errors.Append("Time", err)
+	}
+	if err := typesValidator.Var(s.Duration, "required"); err != nil {
+		errors = errors.Append("Duration", err)
+	}
+	if err := typesValidator.Var(s.StatusCode, "required"); err != nil {
+		errors = errors.Append("StatusCode", err)
+	}
+	if s.Links != nil {
+		if v, ok := any(s.Links).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("Links", err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+// Span_Links Span links to other spans.
+type Span_Links []Span_Links_Item
+
+type Span_Links_Item struct {
+	TraceID *string        `json:"traceId,omitempty"`
+	SpanID  *string        `json:"spanId,omitempty"`
+	Attrs   map[string]any `json:"attrs,omitempty"`
+}
+
+// GroupsResult Result of a span group aggregation query.
+type GroupsResult struct {
+	// Groups Array of group rows with dynamic columns. Each row may contain __hash, __name, __query metadata fields.
+	Groups []map[string]any `json:"groups" jsonschema:"Array of group rows with dynamic columns. Each row may contain __hash, __name, __query metadata fields." validate:"required"`
+
+	// Columns Column definitions describing the result schema.
+	Columns []QueryColumn `json:"columns,omitempty" jsonschema:"Column definitions describing the result schema."`
+
+	// HasMore Whether more results exist beyond the limit.
+	HasMore *bool `json:"hasMore,omitempty" jsonschema:"Whether more results exist beyond the limit."`
+
+	// Query Parsed query parts with error state.
+	Query []map[string]any `json:"query,omitempty" jsonschema:"Parsed query parts with error state."`
+
+	// Order Applied sorting configuration.
+	Order []OrderItem `json:"order,omitempty" jsonschema:"Applied sorting configuration."`
+
+	// Search Applied search matchers.
+	Search []map[string]any `json:"search,omitempty" jsonschema:"Applied search matchers."`
+
+	// WhereAttrs Map of WHERE attribute names to their matched values.
+	WhereAttrs map[string]any `json:"whereAttrs,omitempty" jsonschema:"Map of WHERE attribute names to their matched values."`
+}
+
+func (g GroupsResult) Validate() error {
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(g.Groups, "required"); err != nil {
+		errors = errors.Append("Groups", err)
+	}
+	for i, item := range g.Columns {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Columns[%d]", i), err)
+			}
+		}
+	}
+	for i, item := range g.Order {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Order[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+// QueryColumn Column definition for a query result.
+type QueryColumn struct {
+	// Name Column name.
+	Name string `json:"name" jsonschema:"Column name." validate:"required"`
+
+	// Expr Column expression as written in the query.
+	Expr *string `json:"expr,omitempty" jsonschema:"Column expression as written in the query."`
+
+	// Unit Column unit (e.g., ms, bytes).
+	Unit *string `json:"unit,omitempty" jsonschema:"Column unit (e.g., ms, bytes)."`
+
+	// IsNum Whether the column contains numeric values.
+	IsNum *bool `json:"isNum,omitempty" jsonschema:"Whether the column contains numeric values."`
+
+	// IsAgg Whether the column is an aggregation.
+	IsAgg *bool `json:"isAgg,omitempty" jsonschema:"Whether the column is an aggregation."`
+
+	// IsGroup Whether the column is a GROUP BY key.
+	IsGroup *bool `json:"isGroup,omitempty" jsonschema:"Whether the column is a GROUP BY key."`
+
+	// AggFunc Aggregation function applied to this column.
+	AggFunc *string `json:"aggFunc,omitempty" jsonschema:"Aggregation function applied to this column."`
+}
+
+func (q QueryColumn) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(q))
+}
+
+// Timeseries A named timeseries with values aligned to timestamps.
+type Timeseries struct {
+	// Name Metric name (e.g., countPerMin, errorCountPerMin, durationP50, durationP90, durationP99).
+	Name string `json:"name" jsonschema:"Metric name (e.g., countPerMin, errorCountPerMin, durationP50, durationP90, durationP99)." validate:"required"`
+
+	// Value Array of metric values.
+	Value []float64 `json:"value" jsonschema:"Array of metric values." validate:"required"`
+
+	// Time Array of timestamps as unix milliseconds.
+	Time []float64 `json:"time" jsonschema:"Array of timestamps as unix milliseconds." validate:"required"`
+}
+
+func (t Timeseries) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(t))
+}
+
 type AnnotationCreateRequest struct {
 	// Name Annotation name.
 	Name string `json:"name" jsonschema:"Annotation name." validate:"required"`
