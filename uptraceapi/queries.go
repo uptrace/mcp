@@ -3,6 +3,7 @@
 package uptraceapi
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
@@ -16,12 +17,12 @@ type TimeEnd = time.Time
 
 type Limit = int32
 
-type ListSpansQuery struct {
-	// TimeStart Start time as RFC3339 timestamp.
-	TimeStart TimeStart `json:"time_start" jsonschema:"Start time as RFC3339 timestamp." validate:"required"`
+type PublicListSpansQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeEnd End time as RFC3339 timestamp.
-	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time as RFC3339 timestamp." validate:"required"`
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// TraceID Filter spans by trace ID.
 	TraceID *string `json:"trace_id,omitempty" jsonschema:"Filter spans by trace ID."`
@@ -36,16 +37,16 @@ type ListSpansQuery struct {
 	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
 }
 
-func (l ListSpansQuery) Validate() error {
-	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+func (p PublicListSpansQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(p))
 }
 
-type ListSpanGroupsQuery struct {
-	// TimeStart Start time as RFC3339 timestamp.
-	TimeStart TimeStart `json:"time_start" jsonschema:"Start time as RFC3339 timestamp." validate:"required"`
+type PublicListSpanGroupsQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeEnd End time as RFC3339 timestamp.
-	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time as RFC3339 timestamp." validate:"required"`
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query Aggregate spans using the specified query.
 	Query *string `json:"query,omitempty" jsonschema:"Aggregate spans using the specified query."`
@@ -56,13 +57,300 @@ type ListSpanGroupsQuery struct {
 	// Search Search for spans containing option1 or option2.
 	Search *string `json:"search,omitempty" jsonschema:"Search for spans containing option1 or option2."`
 
-	// DurationGte Duration greater than or equal to N (microseconds).
-	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (microseconds)."`
+	// DurationGte Duration greater than or equal to N (milliseconds).
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (milliseconds)."`
 
-	// DurationLt Duration less than N (microseconds).
-	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (microseconds)."`
+	// DurationLt Duration less than N (milliseconds).
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (milliseconds)."`
+}
+
+func (p PublicListSpanGroupsQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(p))
+}
+
+type ListSpansQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL query to filter spans (e.g., where service_name = 'myservice').
+	Query *string `json:"query,omitempty" jsonschema:"UQL query to filter spans (e.g., where service_name = 'myservice')."`
+
+	// Where Additional WHERE clause appended to the query.
+	Where *string `json:"where,omitempty" jsonschema:"Additional WHERE clause appended to the query."`
+
+	// Search Full-text search for spans containing the given text.
+	Search *string `json:"search,omitempty" jsonschema:"Full-text search for spans containing the given text."`
+
+	// SearchAttrs Attribute names to search within when using search. Can be repeated for multiple attributes.
+	SearchAttrs []string `json:"search_attrs,omitempty" jsonschema:"Attribute names to search within when using search. Can be repeated for multiple attributes."`
+
+	// System Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems.
+	System []string `json:"system,omitempty" jsonschema:"Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems."`
+
+	// SortBy Column names to sort by. Can be repeated for multi-column sort. Defaults to time.
+	SortBy []string `json:"sort_by,omitempty" jsonschema:"Column names to sort by. Can be repeated for multi-column sort. Defaults to time."`
+
+	// SortDir Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC.
+	SortDir []SortDirection `json:"sort_dir,omitempty" jsonschema:"Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC."`
+
+	// DurationGte Duration greater than or equal to N (milliseconds).
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (milliseconds)."`
+
+	// DurationLt Duration less than N (milliseconds).
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (milliseconds)."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
+}
+
+func (l ListSpansQuery) Validate() error {
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
+		errors = errors.Append("TimeGte", err)
+	}
+	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
+		errors = errors.Append("TimeLt", err)
+	}
+	for i, item := range l.SortDir {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("SortDir[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type ListSpanGroupsQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL aggregation query (e.g., perMin(count()) | group by host_name).
+	Query *string `json:"query,omitempty" jsonschema:"UQL aggregation query (e.g., perMin(count()) | group by host_name)."`
+
+	// Where Additional WHERE clause appended to the query.
+	Where *string `json:"where,omitempty" jsonschema:"Additional WHERE clause appended to the query."`
+
+	// Search Full-text search for spans containing the given text.
+	Search *string `json:"search,omitempty" jsonschema:"Full-text search for spans containing the given text."`
+
+	// SearchAttrs Attribute names to search within when using search. Can be repeated for multiple attributes.
+	SearchAttrs []string `json:"search_attrs,omitempty" jsonschema:"Attribute names to search within when using search. Can be repeated for multiple attributes."`
+
+	// System Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems.
+	System []string `json:"system,omitempty" jsonschema:"Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems."`
+
+	// SortBy Column names to sort by. Can be repeated for multi-column sort.
+	SortBy []string `json:"sort_by,omitempty" jsonschema:"Column names to sort by. Can be repeated for multi-column sort."`
+
+	// SortDir Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC.
+	SortDir []SortDirection `json:"sort_dir,omitempty" jsonschema:"Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC."`
+
+	// DurationGte Duration greater than or equal to N (milliseconds).
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (milliseconds)."`
+
+	// DurationLt Duration less than N (milliseconds).
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (milliseconds)."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
 }
 
 func (l ListSpanGroupsQuery) Validate() error {
-	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
+		errors = errors.Append("TimeGte", err)
+	}
+	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
+		errors = errors.Append("TimeLt", err)
+	}
+	for i, item := range l.SortDir {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("SortDir[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type QueryTimeseriesQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL aggregation query (e.g., perMin(count()) | group by service_name).
+	Query *string `json:"query,omitempty" jsonschema:"UQL aggregation query (e.g., perMin(count()) | group by service_name)."`
+
+	// Where Additional WHERE clause appended to the query.
+	Where *string `json:"where,omitempty" jsonschema:"Additional WHERE clause appended to the query."`
+
+	// Search Full-text search for spans containing the given text.
+	Search *string `json:"search,omitempty" jsonschema:"Full-text search for spans containing the given text."`
+
+	// SearchAttrs Attribute names to search within when using search. Can be repeated for multiple attributes.
+	SearchAttrs []string `json:"search_attrs,omitempty" jsonschema:"Attribute names to search within when using search. Can be repeated for multiple attributes."`
+
+	// System Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems.
+	System []string `json:"system,omitempty" jsonschema:"Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems."`
+
+	// Column Aggregate column names to include in the timeseries. Can be repeated for multiple columns.
+	Column []string `json:"column,omitempty" jsonschema:"Aggregate column names to include in the timeseries. Can be repeated for multiple columns."`
+
+	// DurationGte Duration greater than or equal to N (milliseconds).
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (milliseconds)."`
+
+	// DurationLt Duration less than N (milliseconds).
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (milliseconds)."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
+}
+
+func (q QueryTimeseriesQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(q))
+}
+
+type QueryQuantilesQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL query to filter spans (e.g., where service_name = 'myservice').
+	Query *string `json:"query,omitempty" jsonschema:"UQL query to filter spans (e.g., where service_name = 'myservice')."`
+
+	// Where Additional WHERE clause appended to the query.
+	Where *string `json:"where,omitempty" jsonschema:"Additional WHERE clause appended to the query."`
+
+	// Search Full-text search for spans containing the given text.
+	Search *string `json:"search,omitempty" jsonschema:"Full-text search for spans containing the given text."`
+
+	// SearchAttrs Attribute names to search within when using search. Can be repeated for multiple attributes.
+	SearchAttrs []string `json:"search_attrs,omitempty" jsonschema:"Attribute names to search within when using search. Can be repeated for multiple attributes."`
+
+	// System Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems.
+	System []string `json:"system,omitempty" jsonschema:"Filter by system (e.g., log:error, db:postgresql). Can be repeated for multiple systems."`
+
+	// DurationGte Duration greater than or equal to N (milliseconds).
+	DurationGte *int64 `json:"duration_gte,omitempty" jsonschema:"Duration greater than or equal to N (milliseconds)."`
+
+	// DurationLt Duration less than N (milliseconds).
+	DurationLt *int64 `json:"duration_lt,omitempty" jsonschema:"Duration less than N (milliseconds)."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
+}
+
+func (q QueryQuantilesQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(q))
+}
+
+type ListTraceGroupsQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL query for each sub-query. Must have the same count as alias and system. Can be repeated.
+	Query []string `json:"query,omitempty" jsonschema:"UQL query for each sub-query. Must have the same count as alias and system. Can be repeated."`
+
+	// Alias Alias for each sub-query. One alias must be 'root'. Can be repeated.
+	Alias []string `json:"alias,omitempty" jsonschema:"Alias for each sub-query. One alias must be 'root'. Can be repeated."`
+
+	// System System for each sub-query (e.g., spans:all, log:error). Can be repeated.
+	System []string `json:"system,omitempty" jsonschema:"System for each sub-query (e.g., spans:all, log:error). Can be repeated."`
+
+	// SortBy Column names to sort by. Can be repeated for multi-column sort.
+	SortBy []string `json:"sort_by,omitempty" jsonschema:"Column names to sort by. Can be repeated for multi-column sort."`
+
+	// SortDir Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC.
+	SortDir []SortDirection `json:"sort_dir,omitempty" jsonschema:"Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
+}
+
+func (l ListTraceGroupsQuery) Validate() error {
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
+		errors = errors.Append("TimeGte", err)
+	}
+	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
+		errors = errors.Append("TimeLt", err)
+	}
+	for i, item := range l.SortDir {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("SortDir[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type ListTracesQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Query UQL query for each sub-query. Must have the same count as alias and system. Can be repeated.
+	Query []string `json:"query,omitempty" jsonschema:"UQL query for each sub-query. Must have the same count as alias and system. Can be repeated."`
+
+	// Alias Alias for each sub-query. One alias must be 'root'. Can be repeated.
+	Alias []string `json:"alias,omitempty" jsonschema:"Alias for each sub-query. One alias must be 'root'. Can be repeated."`
+
+	// System System for each sub-query (e.g., spans:all, log:error). Can be repeated.
+	System []string `json:"system,omitempty" jsonschema:"System for each sub-query (e.g., spans:all, log:error). Can be repeated."`
+
+	// SortBy Column names to sort by. Can be repeated for multi-column sort. Defaults to time.
+	SortBy []string `json:"sort_by,omitempty" jsonschema:"Column names to sort by. Can be repeated for multi-column sort. Defaults to time."`
+
+	// SortDir Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC.
+	SortDir []SortDirection `json:"sort_dir,omitempty" jsonschema:"Sort direction for each sort_by column. Must match sort_by count. Defaults to DESC."`
+
+	// Limit Limit number of results.
+	Limit *Limit `json:"limit,omitempty" jsonschema:"Limit number of results."`
+}
+
+func (l ListTracesQuery) Validate() error {
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
+		errors = errors.Append("TimeGte", err)
+	}
+	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
+		errors = errors.Append("TimeLt", err)
+	}
+	for i, item := range l.SortDir {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("SortDir[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
 }

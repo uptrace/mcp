@@ -2,7 +2,6 @@ package tools
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -28,10 +27,18 @@ func NewCreateDashboardTool(client *uptraceapi.Client, conf *appconf.Config) *Cr
 func (t *CreateDashboardTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "create_dashboard",
+		Annotations: &mcp.ToolAnnotations{
+			Title:          "Create dashboard",
+			DestructiveHint: boolPtr(false),
+			IdempotentHint: false,
+			OpenWorldHint:  boolPtr(true),
+		},
 		Description: "Create a new dashboard from YAML definition. " +
-			"Supports grid-based and table-based dashboards with metrics queries. " +
-			"Use PromQL-style expressions to visualize spans, events, logs, and metrics. " +
-			"Full YAML format guide: https://uptrace.dev/raw/features/dashboards.md, is necessary to reference the documentation to use this tool correctly.",
+			"Use this to create visualization dashboards for spans, events, logs, and metrics. " +
+			"Supports grid-based and table-based layouts with PromQL-style metric queries. " +
+			"The YAML body must include: schema (v2 or v3), name, version, and tags fields. " +
+			"Use list_dashboards and get_dashboard to inspect existing dashboards as examples. " +
+			"Full YAML format guide: https://uptrace.dev/raw/features/dashboards.md",
 	}, t.handler)
 }
 
@@ -44,7 +51,7 @@ func (t *CreateDashboardTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *createDashboardInput,
-) (*mcp.CallToolResult, any, error) {
+) (*mcp.CallToolResult, *uptraceapi.CreateDashboardFromYAMLResponse, error) {
 	projectID := input.ProjectID
 	if projectID == 0 {
 		projectID = t.conf.Uptrace.ProjectID
@@ -53,19 +60,39 @@ func (t *CreateDashboardTool) handler(
 	if input.Body == "" {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{
-				&mcp.TextContent{Text: "YAML dashboard definition is required"},
+				&mcp.TextContent{Text: "YAML dashboard definition is required. " +
+					"Provide a YAML body with at minimum:\n\n" +
+					"schema: v2\nname: My Dashboard\ntags: []\nversion: v25.04.20\n" +
+					"grid_rows:\n  - title: General\n    items:\n      - title: Request rate\n" +
+					"        width: 12\n        height: 28\n        type: chart\n" +
+					"        metrics:\n          - metric_name as $var\n" +
+					"        query:\n          - sum($var)\n\n" +
+					"See https://uptrace.dev/raw/features/dashboards.md for full format guide."},
 			},
 			IsError: true,
 		}, nil, nil
 	}
-	if !strings.Contains(input.Body, "schema:") ||
-		!strings.Contains(input.Body, "name") ||
-		!strings.Contains(input.Body, "version") ||
-		!strings.Contains(input.Body, "tags") {
+
+	var missing []string
+	if !strings.Contains(input.Body, "schema:") {
+		missing = append(missing, "schema (v2 or v3)")
+	}
+	if !strings.Contains(input.Body, "name") {
+		missing = append(missing, "name")
+	}
+	if !strings.Contains(input.Body, "version") {
+		missing = append(missing, "version")
+	}
+	if !strings.Contains(input.Body, "tags") {
+		missing = append(missing, "tags")
+	}
+	if len(missing) > 0 {
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{
 				&mcp.TextContent{
-					Text: "Missing required field 'schema: v2' or 'schema: v3', 'name', 'version', or 'tags' in the YAML definition",
+					Text: "Missing required fields: " + strings.Join(missing, ", ") + ". " +
+						"Every dashboard YAML must include schema, name, version, and tags. " +
+						"Try using list_dashboards and get_dashboard to inspect existing dashboards as examples.",
 				},
 			},
 			IsError: true,
@@ -88,12 +115,7 @@ func (t *CreateDashboardTool) handler(
 
 	resp, err := t.client.CreateDashboardFromYAML(ctx, opts, runtime.RequestEditorFn(setBody))
 	if err != nil {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("Error: %v", err)},
-			},
-			IsError: true,
-		}, nil, nil
+		return nil, nil, err
 	}
 
 	return nil, resp, nil

@@ -8,6 +8,41 @@ import (
 	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
 )
 
+// SortDirection Sort direction.
+type SortDirection string
+
+const (
+	ASC  SortDirection = "ASC"
+	DESC SortDirection = "DESC"
+)
+
+// Validate checks if the SortDirection value is valid
+func (s SortDirection) Validate() error {
+	switch s {
+	case ASC, DESC:
+		return nil
+	default:
+		return runtime.NewValidationErrorsFromString("Enum", fmt.Sprintf("must be a valid SortDirection value, got: %v", s))
+	}
+}
+
+type OrderItemOrder string
+
+const (
+	Asc  OrderItemOrder = "asc"
+	Desc OrderItemOrder = "desc"
+)
+
+// Validate checks if the OrderItemOrder value is valid
+func (o OrderItemOrder) Validate() error {
+	switch o {
+	case Asc, Desc:
+		return nil
+	default:
+		return runtime.NewValidationErrorsFromString("Enum", fmt.Sprintf("must be a valid OrderItemOrder value, got: %v", o))
+	}
+}
+
 type OrgUserFixtureRole string
 
 const (
