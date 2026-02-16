@@ -30,15 +30,7 @@ func (t *QueryQuantilesTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "Query duration percentiles (p50, p90, p99) and count/error rate over time. " +
-			"Use this to identify latency outliers, track performance degradation, or compare SLO compliance. " +
-			"Returns named timeseries: count, countPerMin, errorCount, errorCountPerMin, " +
-			"durationP50, durationP90, durationP99, durationMax. " +
-			"Supports WHERE filters (e.g. where service_name = 'myservice'), " +
-			"full-text search, system filtering (e.g. httpserver:all), and duration filtering. " +
-			"Use timeseries instead when you need custom aggregation queries with GROUP BY. " +
-			"Use list_span_groups instead when you need a single aggregated snapshot. " +
-			"Documentation: https://uptrace.dev/features/querying/spans",
+		Description: uptraceapi.Operations["queryQuantiles"].Description,
 	}, t.handler)
 }
 

@@ -28,17 +28,12 @@ func (t *CreateDashboardTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "create_dashboard",
 		Annotations: &mcp.ToolAnnotations{
-			Title:          "Create dashboard",
+			Title:           "Create dashboard",
 			DestructiveHint: boolPtr(false),
-			IdempotentHint: false,
-			OpenWorldHint:  boolPtr(true),
+			IdempotentHint:  false,
+			OpenWorldHint:   boolPtr(true),
 		},
-		Description: "Create a new dashboard from YAML definition. " +
-			"Use this to create visualization dashboards for spans, events, logs, and metrics. " +
-			"Supports grid-based and table-based layouts with PromQL-style metric queries. " +
-			"The YAML body must include: schema (v2 or v3), name, version, and tags fields. " +
-			"Use list_dashboards and get_dashboard to inspect existing dashboards as examples. " +
-			"Full YAML format guide: https://uptrace.dev/raw/features/dashboards.md",
+		Description: uptraceapi.Operations["createDashboardFromYAML"].Description,
 	}, t.handler)
 }
 
@@ -62,38 +57,12 @@ func (t *CreateDashboardTool) handler(
 			Content: []mcp.Content{
 				&mcp.TextContent{Text: "YAML dashboard definition is required. " +
 					"Provide a YAML body with at minimum:\n\n" +
-					"schema: v2\nname: My Dashboard\ntags: []\nversion: v25.04.20\n" +
+					"schema: v2\nversion: 1\ntags:\n  - env: prod\nname: My Dashboard\n" +
 					"grid_rows:\n  - title: General\n    items:\n      - title: Request rate\n" +
 					"        width: 12\n        height: 28\n        type: chart\n" +
 					"        metrics:\n          - metric_name as $var\n" +
 					"        query:\n          - sum($var)\n\n" +
 					"See https://uptrace.dev/raw/features/dashboards.md for full format guide."},
-			},
-			IsError: true,
-		}, nil, nil
-	}
-
-	var missing []string
-	if !strings.Contains(input.Body, "schema:") {
-		missing = append(missing, "schema (v2 or v3)")
-	}
-	if !strings.Contains(input.Body, "name") {
-		missing = append(missing, "name")
-	}
-	if !strings.Contains(input.Body, "version") {
-		missing = append(missing, "version")
-	}
-	if !strings.Contains(input.Body, "tags") {
-		missing = append(missing, "tags")
-	}
-	if len(missing) > 0 {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{
-					Text: "Missing required fields: " + strings.Join(missing, ", ") + ". " +
-						"Every dashboard YAML must include schema, name, version, and tags. " +
-						"Try using list_dashboards and get_dashboard to inspect existing dashboards as examples.",
-				},
 			},
 			IsError: true,
 		}, nil, nil

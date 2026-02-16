@@ -29,12 +29,7 @@ func (t *ListDashboardsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "List dashboards configured in Uptrace. " +
-			"Use this to browse available dashboards for monitoring and visualization. " +
-			"Returns dashboard summaries with ID, name, and tags. " +
-			"Use get_dashboard with a specific ID to retrieve full dashboard details including grid rows and items. " +
-			"Use create_dashboard to create a new dashboard from YAML. " +
-			"Documentation: https://uptrace.dev/llms.txt#features > 'Dashboards'",
+		Description: uptraceapi.Operations["listDashboards"].Description,
 	}, t.handler)
 }
 

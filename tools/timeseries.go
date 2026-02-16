@@ -30,17 +30,7 @@ func (t *QueryTimeseriesTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "Query time-bucketed aggregation data for spans. " +
-			"Use this to analyze trends over time, detect anomalies, or build charts. " +
-			"Returns aligned timestamps with auto-computed interval based on the time range. " +
-			"Use UQL aggregation query (e.g. 'perMin(count()) | group by service_name') " +
-			"with aggregate functions: count(), avg(), sum(), p50(), p90(), p99(), etc. " +
-			"Use 'column' parameter to select specific aggregate columns for the timeseries. " +
-			"Supports WHERE filters, full-text search, system filtering, and duration filtering. " +
-			"Returns groups with arrays of float values aligned with the time array. " +
-			"Use list_span_groups instead when you need a single aggregated snapshot (not time-bucketed). " +
-			"Use quantiles instead when you only need latency percentiles (p50/p90/p99). " +
-			"Documentation: https://uptrace.dev/features/querying/spans",
+		Description: uptraceapi.Operations["queryTimeseries"].Description,
 	}, t.handler)
 }
 

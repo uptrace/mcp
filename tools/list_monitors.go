@@ -29,12 +29,7 @@ func (t *ListMonitorsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "List monitoring rules and alerts configured in Uptrace. " +
-			"Use this to review alert configurations, check notification channels, " +
-			"and understand monitoring thresholds. " +
-			"Returns monitors with their type, state, query, and notification settings. " +
-			"Use list_dashboards instead when looking for visualization dashboards. " +
-			"Documentation: https://uptrace.dev/llms.txt#features > 'Monitoring and Alerts Configuration'",
+		Description: uptraceapi.Operations["listMonitors"].Description,
 	}, t.handler)
 }
 
