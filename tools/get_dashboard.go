@@ -29,10 +29,7 @@ func (t *GetDashboardTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "Get a dashboard by ID from Uptrace. " +
-			"Use this to retrieve full dashboard details including grid rows, items, and metric queries. " +
-			"Requires a dashboard_id — use list_dashboards first to find available dashboard IDs. " +
-			"Documentation: https://uptrace.dev/llms.txt#features > 'Dashboards'",
+		Description: uptraceapi.Operations["getDashboard"].Description,
 	}, t.handler)
 }
 
@@ -48,14 +45,6 @@ func (t *GetDashboardTool) handler(
 		input.PathParams.ProjectID = t.conf.Uptrace.ProjectID
 	}
 
-	if input.PathParams.DashboardID == 0 {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: "Error: DashboardID is required"},
-			},
-			IsError: true,
-		}, nil, nil
-	}
 	resp, err := t.client.GetDashboard(ctx, input)
 	if err != nil {
 		return nil, nil, err

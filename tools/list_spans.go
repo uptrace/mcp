@@ -30,18 +30,7 @@ func (t *ListSpansTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "List individual spans using UQL (Uptrace Query Language). " +
-			"Use this to inspect specific span details, search for errors, or browse recent operations. " +
-			"Supports WHERE filters (e.g. where service_name = 'myservice', where _status_code = 'error', " +
-			"where _dur_ms > 100ms), full-text search (e.g. 'word1|word2 -excluded'), " +
-			"system filtering (e.g. httpserver:all, db:postgresql, log:error), " +
-			"duration filtering in milliseconds, and sorting by any span field. " +
-			"Span fields use underscore prefix: _name, _dur_ms, _status_code, _time, _trace_id, _kind. " +
-			"Attributes use dot-to-underscore: service.name becomes service_name. " +
-			"Returns individual span objects with attrs, timing, and status. " +
-			"Use list_span_groups instead when you need aggregated metrics (count, avg, p99). " +
-			"Use list_traces instead when you need to find traces matching multi-span criteria. " +
-			"Documentation: https://uptrace.dev/features/querying/spans",
+		Description: uptraceapi.Operations["listSpans"].Description,
 	}, t.handler)
 }
 

@@ -30,16 +30,7 @@ func (t *ListSpanGroupsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "Aggregate spans into groups using UQL queries. " +
-			"Use this to get aggregated metrics like request count, error rate, or latency percentiles. " +
-			"Aggregate functions: count(), avg(), sum(), min(), max(), p50(), p75(), p90(), p99(), uniq(), apdex(). " +
-			"Supports GROUP BY (e.g. group by service_name), HAVING (e.g. having p50(_dur_ms) > 100ms), " +
-			"WHERE filters, full-text search, system filtering (e.g. httpserver:all, db:postgresql), " +
-			"and duration filtering. Example query: 'perMin(count()) | group by host_name'. " +
-			"Returns grouped rows with dynamic columns based on the query. " +
-			"Use list_spans instead when you need individual span details. " +
-			"Use timeseries instead when you need time-bucketed data for charts. " +
-			"Documentation: https://uptrace.dev/features/querying/grouping",
+		Description: uptraceapi.Operations["listSpanGroups"].Description,
 	}, t.handler)
 }
 

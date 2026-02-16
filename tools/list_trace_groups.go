@@ -30,16 +30,7 @@ func (t *ListTraceGroupsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "Aggregate traces into groups using correlated sub-queries. " +
-			"Use this to find trace patterns and get aggregated trace metrics. " +
-			"Requires parallel arrays: query[], alias[], system[] with matching lengths. " +
-			"One alias must be 'root' to identify the root span query. " +
-			"Additional sub-queries filter traces where child spans match specific criteria. " +
-			"Systems: spans:all, httpserver:all, db:postgresql, log:error, etc. " +
-			"Returns grouped rows with dynamic columns. " +
-			"Use list_traces instead when you need individual trace details. " +
-			"Use list_span_groups instead when you don't need cross-span trace correlation. " +
-			"Documentation: https://uptrace.dev/features/querying/spans",
+		Description: uptraceapi.Operations["listTraceGroups"].Description,
 	}, t.handler)
 }
 

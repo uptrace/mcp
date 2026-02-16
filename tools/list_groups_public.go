@@ -30,11 +30,7 @@ func (t *PublicListSpanGroupsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "List span groups using the stable public API. " +
-			"Use this for basic span group browsing with search and duration filtering. " +
-			"For advanced aggregation with UQL queries (GROUP BY, HAVING, aggregate functions), " +
-			"use list_span_groups instead. " +
-			"Documentation: https://uptrace.dev/features/querying/grouping",
+		Description: uptraceapi.Operations["publicListSpanGroups"].Description,
 	}, t.handler)
 }
 

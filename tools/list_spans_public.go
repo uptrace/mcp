@@ -30,12 +30,7 @@ func (t *PublicListSpansTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: "List spans using the stable public API. " +
-			"Use this for simple span lookups by trace_id, span ID, or parent_id. " +
-			"Best for retrieving known spans when you already have an ID. " +
-			"For advanced filtering with UQL queries (WHERE, search, system filtering), " +
-			"use list_spans instead. " +
-			"Documentation: https://uptrace.dev/features/querying/spans",
+		Description: uptraceapi.Operations["publicListSpans"].Description,
 	}, t.handler)
 }
 
