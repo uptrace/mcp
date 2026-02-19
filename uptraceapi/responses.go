@@ -156,6 +156,18 @@ type ListDashboardTagsResponse struct {
 
 type ListDashboardTagsErrorResponse = BadRequest
 
+type ExploreMetricsResponseJSON = ExploreMetricsResponse
+
+type ExploreMetricsErrorResponse = BadRequest
+
+type ListMetricAttributesResponseJSON = ListMetricAttributesResponse
+
+type ListMetricAttributesErrorResponse = BadRequest
+
+type ListMetricAttributeValuesResponseJSON = ListMetricAttributeValuesResponse
+
+type ListMetricAttributeValuesErrorResponse = BadRequest
+
 type CreateDashboardFromYAMLResponse = DashboardResponse
 
 type CreateDashboardFromYAMLErrorResponse = BadRequest

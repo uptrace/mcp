@@ -85,6 +85,15 @@ type ClientInterface interface {
 	// ListDashboardTags List dashboard tags
 	ListDashboardTags(ctx context.Context, options *ListDashboardTagsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListDashboardTagsResponse, error)
 
+	// ExploreMetrics Explore metrics
+	ExploreMetrics(ctx context.Context, options *ExploreMetricsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ExploreMetricsResponseJSON, error)
+
+	// ListMetricAttributes List metric attributes
+	ListMetricAttributes(ctx context.Context, options *ListMetricAttributesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListMetricAttributesResponseJSON, error)
+
+	// ListMetricAttributeValues List attribute values
+	ListMetricAttributeValues(ctx context.Context, options *ListMetricAttributeValuesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListMetricAttributeValuesResponseJSON, error)
+
 	// CreateDashboardFromYAML Create dashboard from YAML
 	CreateDashboardFromYAML(ctx context.Context, options *CreateDashboardFromYAMLRequestOptions, reqEditors ...runtime.RequestEditorFn) (*CreateDashboardFromYAMLResponse, error)
 
@@ -949,6 +958,138 @@ func (c *Client) ListDashboardTags(ctx context.Context, options *ListDashboardTa
 	}
 
 	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/projects/{project_id}/dashboards/tags")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// ExploreMetrics Explore metrics
+func (c *Client) ExploreMetrics(ctx context.Context, options *ExploreMetricsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ExploreMetricsResponseJSON, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/metrics/{project_id}/explore",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ExploreMetricsResponseJSON, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ExploreMetricsErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ExploreMetricsResponseJSON)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/metrics/{project_id}/explore")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// ListMetricAttributes List metric attributes
+func (c *Client) ListMetricAttributes(ctx context.Context, options *ListMetricAttributesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListMetricAttributesResponseJSON, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/metrics/{project_id}/attributes",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ListMetricAttributesResponseJSON, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ListMetricAttributesErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ListMetricAttributesResponseJSON)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/metrics/{project_id}/attributes")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
+// ListMetricAttributeValues List attribute values
+func (c *Client) ListMetricAttributeValues(ctx context.Context, options *ListMetricAttributeValuesRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListMetricAttributeValuesResponseJSON, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/metrics/{project_id}/attributes/{attr_key}",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ListMetricAttributeValuesResponseJSON, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ListMetricAttributeValuesErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ListMetricAttributeValuesResponseJSON)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/metrics/{project_id}/attributes/{attr_key}")
 	if err != nil {
 		return nil, fmt.Errorf("error executing request: %w", err)
 	}

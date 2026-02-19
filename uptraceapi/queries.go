@@ -354,3 +354,48 @@ func (l ListTracesQuery) Validate() error {
 	}
 	return errors
 }
+
+type ExploreMetricsQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Search Search string to filter metrics by name.
+	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`
+}
+
+func (e ExploreMetricsQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(e))
+}
+
+type ListMetricAttributesQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Search Search string to filter metrics by name.
+	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`
+}
+
+func (l ListMetricAttributesQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type ListMetricAttributeValuesQuery struct {
+	// TimeGte Start time (inclusive) as RFC3339 timestamp.
+	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+
+	// TimeLt End time (exclusive) as RFC3339 timestamp.
+	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+
+	// Search Search string to filter metrics by name.
+	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`
+}
+
+func (l ListMetricAttributeValuesQuery) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}

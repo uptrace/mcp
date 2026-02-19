@@ -62,6 +62,10 @@ var Operations = map[string]OperationDescription{
 		Summary:     "Delete notification channel",
 		Description: "Delete an existing notification channel.",
 	},
+	"exploreMetrics": {
+		Summary:     "Explore metrics",
+		Description: "Discover available metrics and their metadata. Returns metric names, instrument types (histogram, counter, gauge, additive), units, descriptions, available attributes, and library info. Use the instrument type to choose the correct aggregate function: histogram metrics support count(), p50(), p90(), p99(); counter metrics support sum(), perMin(sum()); gauge metrics support sum(), avg(), max(), min(); additive metrics support sum(), perMin(sum()). Use the search parameter to filter by metric name. Use this tool before creating dashboards to discover metrics and their attributes.",
+	},
 	"getDashboard": {
 		Summary:     "Get a dashboard",
 		Description: "Get a dashboard by ID from Uptrace. Use this to retrieve full dashboard details including grid rows, items, and metric queries. Requires a dashboard_id -- use list_dashboards first to find available dashboard IDs. Documentation: https://uptrace.dev/features/dashboards",
@@ -85,6 +89,14 @@ var Operations = map[string]OperationDescription{
 	"listDashboards": {
 		Summary:     "List dashboards",
 		Description: "List dashboards configured in Uptrace. Use this to browse available dashboards for monitoring and visualization. Returns dashboard summaries with ID, name, and tags. Use get_dashboard with a specific ID to retrieve full dashboard details including grid rows and items. Use create_dashboard to create a new dashboard from YAML. Documentation: https://uptrace.dev/features/dashboards",
+	},
+	"listMetricAttributeValues": {
+		Summary:     "List attribute values",
+		Description: "List values for a specific metric attribute key. Returns distinct attribute values with their occurrence count. Use the search parameter to filter by metric name.",
+	},
+	"listMetricAttributes": {
+		Summary:     "List metric attributes",
+		Description: "List available attribute keys for metrics. Returns attribute keys with their kind (str, int, float), unit, and count (how many metrics use each attribute). Use the search parameter to filter by metric name. Use this to discover which attributes are available for group by in dashboard queries.",
 	},
 	"listMonitors": {
 		Summary:     "List monitors",

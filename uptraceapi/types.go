@@ -253,6 +253,128 @@ func (a AnnotationCreateRequest) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(a))
 }
 
+type ExploreMetricsResponse struct {
+	Metrics []ExploredMetric `json:"metrics" validate:"required"`
+	HasMore bool             `json:"hasMore"`
+}
+
+func (e ExploreMetricsResponse) Validate() error {
+	var errors runtime.ValidationErrors
+	for i, item := range e.Metrics {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Metrics[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type ExploredMetric struct {
+	// Name Metric name.
+	Name string `json:"name" jsonschema:"Metric name." validate:"required"`
+
+	// Instrument Instrument type: histogram, counter, gauge, or additive.
+	Instrument string `json:"instrument" jsonschema:"Instrument type: histogram, counter, gauge, or additive." validate:"required"`
+
+	// Unit Metric unit.
+	Unit *string `json:"unit,omitempty" jsonschema:"Metric unit."`
+
+	// Description Metric description.
+	Description *string `json:"description,omitempty" jsonschema:"Metric description."`
+
+	// AttrKeys Available attribute keys for grouping.
+	AttrKeys []string `json:"attrKeys,omitempty" jsonschema:"Available attribute keys for grouping."`
+
+	// LibraryName Instrumentation library name.
+	LibraryName *string `json:"libraryName,omitempty" jsonschema:"Instrumentation library name."`
+
+	// LibraryVersion Instrumentation library version.
+	LibraryVersion *string `json:"libraryVersion,omitempty" jsonschema:"Instrumentation library version."`
+
+	// NumTimeseries Number of active timeseries.
+	NumTimeseries *int `json:"numTimeseries,omitempty" jsonschema:"Number of active timeseries."`
+}
+
+func (e ExploredMetric) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(e))
+}
+
+type ListMetricAttributesResponse struct {
+	Items []MetricAttributeKey `json:"items" validate:"required"`
+}
+
+func (l ListMetricAttributesResponse) Validate() error {
+	var errors runtime.ValidationErrors
+	for i, item := range l.Items {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Items[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type MetricAttributeKey struct {
+	// Value Attribute key with type suffix (e.g. host_name::str).
+	Value string `json:"value" jsonschema:"Attribute key with type suffix (e.g. host_name::str)." validate:"required"`
+
+	// Kind Attribute type: str, int, float.
+	Kind string `json:"kind" jsonschema:"Attribute type: str, int, float." validate:"required"`
+
+	// Unit Attribute unit.
+	Unit *string `json:"unit,omitempty" jsonschema:"Attribute unit."`
+
+	// Pinned Whether the attribute is pinned.
+	Pinned *bool `json:"pinned,omitempty" jsonschema:"Whether the attribute is pinned."`
+
+	// Count Number of metrics using this attribute.
+	Count int `json:"count" jsonschema:"Number of metrics using this attribute." validate:"required"`
+}
+
+func (m MetricAttributeKey) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(m))
+}
+
+type ListMetricAttributeValuesResponse struct {
+	Items   []MetricAttributeValue `json:"items" validate:"required"`
+	HasMore bool                   `json:"hasMore"`
+}
+
+func (l ListMetricAttributeValuesResponse) Validate() error {
+	var errors runtime.ValidationErrors
+	for i, item := range l.Items {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Items[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type MetricAttributeValue struct {
+	// Value Attribute value.
+	Value string `json:"value" jsonschema:"Attribute value." validate:"required"`
+
+	// Count Occurrence count.
+	Count int `json:"count" jsonschema:"Occurrence count." validate:"required"`
+}
+
+func (m MetricAttributeValue) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(m))
+}
+
 type Error struct {
 	Code    string `json:"code" validate:"required"`
 	Message string `json:"message" validate:"required"`

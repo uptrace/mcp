@@ -162,6 +162,36 @@ func (l ListDashboardTagsPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
+type ExploreMetricsPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (e ExploreMetricsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(e))
+}
+
+type ListMetricAttributesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListMetricAttributesPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type ListMetricAttributeValuesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+
+	// AttrKey Attribute key including type suffix (e.g. host_name::str, http_status_code::int).
+	AttrKey string `json:"attr_key" jsonschema:"Attribute key including type suffix (e.g. host_name::str, http_status_code::int)." validate:"required"`
+}
+
+func (l ListMetricAttributeValuesPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
 type CreateDashboardFromYAMLPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`

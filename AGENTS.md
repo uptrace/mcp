@@ -193,6 +193,9 @@ This server exposes the following MCP tools:
 | `list_trace_groups` | List trace groups |
 | `list_traces` | List traces |
 | `list_monitors` | List monitors (alerts) from Uptrace |
+| `explore_metrics` | Discover metrics with instrument types, units, descriptions, and attributes |
+| `list_metric_attributes` | List available attribute keys for metrics with usage counts |
+| `list_metric_attribute_values` | List values for a specific metric attribute key |
 | `create_dashboard` | Create a dashboard from YAML definition |
 | `list_dashboards` | List all dashboards |
 | `list_dashboard_tags` | List available dashboard tags for a project |
@@ -230,7 +233,7 @@ See `config.yaml.example` for reference.
 ---
 ## Creating Dashboards
 
-**IMPORTANT:** Before creating a dashboard, use `get_dashboard_yaml` on an existing dashboard to see the exact format. Only use fields shown below — the API strictly rejects unknown fields.
+**IMPORTANT:** Before creating a dashboard, use `get_dashboard_yaml` on an existing dashboard to understand the structure. **WARNING:** The read output contains properties (`sparkline`, `color`, `aggFunc`) that the API **rejects on create/update** — do NOT copy them. Only use fields shown below.
 
 ### Minimal example
 
@@ -322,13 +325,13 @@ grid_rows:
 
 ### Key rules
 
-- **No unknown fields.** The API rejects any field not in the schema. Use `get_dashboard_yaml` on an existing dashboard to verify the format.
+- **No unknown fields.** The API rejects any field not in the schema.
+- **`get_dashboard_yaml` output contains read-only properties.** Use it to understand structure, but do NOT copy `sparkline`, `color`, or `aggFunc` properties — the API **rejects** them on create/update. Only use `unit` in override properties.
 - **`overrides` format differs** by context:
   - **Table overrides**: `column` (required) + `properties` — match by query alias
   - **`table_grid_items` overrides**: `column` (required) + `properties` — same as table, `column` must match a query alias
   - **Grid item overrides** (in `grid_rows`): `matchers` + `properties` — match by metric alias
 - **`properties` and `overrides`** are arrays of `{name, value}` pairs, never bare key-value maps.
-- **Sparkline** cannot be set via the YAML create/update API. Do NOT include `sparkline` in overrides.
 - **Empty arrays** (`properties: []`, `overrides: []`) are valid and can be omitted.
 - **Only known chart property**: `fillOpacity: 0.1` (for stacked/area charts).
 
@@ -368,10 +371,39 @@ grid_rows:
 **Gauge metrics** (e.g. `system_memory_usage`, `redis_memory_rss`, `redis_db_keys`):
 - `sum()`, `avg()`, `max()`, `min()`
 
+### Metric discovery
+
+Use the following tools to discover metrics before creating dashboards:
+
+1. **`explore_metrics`** — returns per-metric metadata:
+   - `name` — metric name (e.g. `http_server_duration`)
+   - `instrument` — type that determines allowed aggregate functions: `histogram`, `counter`, `gauge`, `additive`
+   - `unit` — metric unit (e.g. `milliseconds`, `bytes`)
+   - `description` — what the metric measures
+   - `attrKeys` — all available attributes with type suffixes (e.g. `service_name::str`, `http_status_code::int`)
+   - `libraryName` — instrumentation library (e.g. `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp`)
+   - `libraryVersion` — library version
+   - `numTimeseries` — number of active timeseries
+   - Use `search` param to filter by metric name (e.g. `search="redis"`, `search="http_server"`)
+
+**Dashboards are built from metrics that share the same `libraryName`.** For example, all Redis metrics come from `opentelemetry-collector-contrib/receiver/redisreceiver`, all HTTP server metrics from `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp`. When creating a dashboard, first use `explore_metrics` to find metrics, then group them by `libraryName` — metrics from the same library share the same attributes and belong together on one dashboard.
+
+2. **`list_metric_attributes`** — returns attribute keys across all metrics (or filtered by `search`):
+   - `value` — attribute key with type suffix (e.g. `host_name::str`)
+   - `kind` — attribute type (`str`, `int`, `float`)
+   - `count` — how many metrics use this attribute
+   - Use this to find common grouping attributes for dashboard tables
+
+3. **`list_metric_attribute_values`** — returns distinct values for a specific attribute key:
+   - Requires `attr_key` path param with type suffix (e.g. `host_name::str`)
+   - Returns `value` and `count` for each distinct value
+   - Use this to understand what values exist for filtering (e.g. `$var{service_name="myservice"}`)
+
 ### Tags
 
 Simple string labels for categorizing dashboards. Common tags:
 `otel`, `app`, `db`, `infra`, `logs`, `tracing`, `network`, `self_monitoring`
+
 ## Development
 
 ```bash
