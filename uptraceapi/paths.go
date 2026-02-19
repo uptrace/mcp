@@ -3,7 +3,7 @@
 package uptraceapi
 
 import (
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 type ProjectID = int64
@@ -150,6 +150,15 @@ type ListDashboardsPath struct {
 }
 
 func (l ListDashboardsPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type ListDashboardTagsPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListDashboardTagsPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 

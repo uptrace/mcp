@@ -5,7 +5,7 @@ package uptraceapi
 import (
 	"fmt"
 
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 // SortDirection Sort direction.
