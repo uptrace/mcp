@@ -6,7 +6,7 @@ import (
 
 	"github.com/uptrace/mcp/appconf"
 	"github.com/uptrace/mcp/uptraceapi"
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 // httpClient wraps http.Client to implement runtime.HttpRequestDoer.

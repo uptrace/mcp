@@ -4,7 +4,7 @@ package uptraceapi
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 var typesValidator *validator.Validate

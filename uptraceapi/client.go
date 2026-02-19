@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 // Client is the client for the API implementing the Client interface.
@@ -81,6 +81,9 @@ type ClientInterface interface {
 
 	// ListDashboards List dashboards
 	ListDashboards(ctx context.Context, options *ListDashboardsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListDashboardsResponse, error)
+
+	// ListDashboardTags List dashboard tags
+	ListDashboardTags(ctx context.Context, options *ListDashboardTagsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListDashboardTagsResponse, error)
 
 	// CreateDashboardFromYAML Create dashboard from YAML
 	CreateDashboardFromYAML(ctx context.Context, options *CreateDashboardFromYAMLRequestOptions, reqEditors ...runtime.RequestEditorFn) (*CreateDashboardFromYAMLResponse, error)
@@ -908,13 +911,58 @@ func (c *Client) ListDashboards(ctx context.Context, options *ListDashboardsRequ
 	return responseParser(ctx, resp)
 }
 
+// ListDashboardTags List dashboard tags
+func (c *Client) ListDashboardTags(ctx context.Context, options *ListDashboardTagsRequestOptions, reqEditors ...runtime.RequestEditorFn) (*ListDashboardTagsResponse, error) {
+	var err error
+	reqParams := runtime.RequestOptionsParameters{
+		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/tags",
+		Method:     "GET",
+		Options:    options,
+	}
+
+	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	responseParser := func(ctx context.Context, resp *runtime.Response) (*ListDashboardTagsResponse, error) {
+		bodyBytes := resp.Content
+		if resp.StatusCode != 200 {
+			target := new(ListDashboardTagsErrorResponse)
+			err = json.Unmarshal(bodyBytes, target)
+			if err != nil {
+				return nil, fmt.Errorf("error decoding response: %w", err)
+			}
+
+			if errTarget, ok := any(*target).(error); ok {
+				return nil, runtime.NewClientAPIError(errTarget, runtime.WithStatusCode(resp.StatusCode))
+			}
+			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
+				runtime.WithStatusCode(resp.StatusCode))
+		}
+		target := new(ListDashboardTagsResponse)
+		if err = json.Unmarshal(bodyBytes, target); err != nil {
+			err = fmt.Errorf("error decoding response: %w", err)
+			return nil, err
+		}
+		return target, nil
+	}
+
+	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/projects/{project_id}/dashboards/tags")
+	if err != nil {
+		return nil, fmt.Errorf("error executing request: %w", err)
+	}
+	return responseParser(ctx, resp)
+}
+
 // CreateDashboardFromYAML Create dashboard from YAML
 func (c *Client) CreateDashboardFromYAML(ctx context.Context, options *CreateDashboardFromYAMLRequestOptions, reqEditors ...runtime.RequestEditorFn) (*CreateDashboardFromYAMLResponse, error) {
 	var err error
 	reqParams := runtime.RequestOptionsParameters{
-		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/yaml",
-		Method:     "POST",
-		Options:    options,
+		RequestURL:  c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/yaml",
+		Method:      "POST",
+		Options:     options,
+		ContentType: "text/yaml",
 	}
 
 	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)
@@ -1069,12 +1117,8 @@ func (c *Client) GetDashboardYAML(ctx context.Context, options *GetDashboardYAML
 			return nil, runtime.NewClientAPIError(fmt.Errorf("API error (status %d): %v", resp.StatusCode, *target),
 				runtime.WithStatusCode(resp.StatusCode))
 		}
-		target := new(GetDashboardYAMLResponse)
-		if err = json.Unmarshal(bodyBytes, target); err != nil {
-			err = fmt.Errorf("error decoding response: %w", err)
-			return nil, err
-		}
-		return target, nil
+		result := GetDashboardYAMLResponse(bodyBytes)
+		return &result, nil
 	}
 
 	resp, err := c.apiClient.ExecuteRequest(ctx, req, "/internal/v1/projects/{project_id}/dashboards/{dashboard_id}/yaml")
@@ -1088,9 +1132,10 @@ func (c *Client) GetDashboardYAML(ctx context.Context, options *GetDashboardYAML
 func (c *Client) UpdateDashboardFromYAML(ctx context.Context, options *UpdateDashboardFromYAMLRequestOptions, reqEditors ...runtime.RequestEditorFn) (*UpdateDashboardFromYAMLResponse, error) {
 	var err error
 	reqParams := runtime.RequestOptionsParameters{
-		RequestURL: c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/{dashboard_id}/yaml",
-		Method:     "PUT",
-		Options:    options,
+		RequestURL:  c.apiClient.GetBaseURL() + "/internal/v1/projects/{project_id}/dashboards/{dashboard_id}/yaml",
+		Method:      "PUT",
+		Options:     options,
+		ContentType: "text/yaml",
 	}
 
 	req, err := c.apiClient.CreateRequest(ctx, reqParams, reqEditors...)

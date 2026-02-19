@@ -16,7 +16,13 @@ mcp/
 │   ├── tools.go            # Register() for all tools
 │   ├── list_groups.go      # list_span_groups tool (UQL aggregation)
 │   ├── list_spans.go       # list_spans tool
-│   └── list_monitors.go    # list_monitors tool
+│   ├── list_monitors.go    # list_monitors tool
+│   ├── create_dashboard.go # create_dashboard tool
+│   ├── list_dashboards.go  # list_dashboards tool
+│   ├── get_dashboard.go    # get_dashboard tool
+│   ├── get_dashboard_yaml.go    # get_dashboard_yaml tool
+│   ├── update_dashboard_yaml.go # update_dashboard_yaml tool
+│   └── delete_dashboard.go      # delete_dashboard tool
 ├── uptraceapi/             # Generated Uptrace API client (do not edit)
 │   ├── client.go           # HTTP client methods
 │   ├── types.go            # API types and models
@@ -182,7 +188,18 @@ This server exposes the following MCP tools:
 |-----------|-------------|
 | `list_span_groups` | Aggregate spans using UQL (Uptrace Query Language) |
 | `list_spans` | List spans from Uptrace for analyzing distributed traces |
+| `query_timeseries` | Query timeseries data for metrics |
+| `query_quantiles` | Query quantile data for metrics |
+| `list_trace_groups` | List trace groups |
+| `list_traces` | List traces |
 | `list_monitors` | List monitors (alerts) from Uptrace |
+| `create_dashboard` | Create a dashboard from YAML definition |
+| `list_dashboards` | List all dashboards |
+| `list_dashboard_tags` | List available dashboard tags for a project |
+| `get_dashboard` | Get dashboard details by ID |
+| `get_dashboard_yaml` | Get dashboard YAML definition by ID |
+| `update_dashboard_yaml` | Update a dashboard from YAML definition |
+| `delete_dashboard` | Delete a dashboard by ID |
 
 ---
 
@@ -213,23 +230,148 @@ See `config.yaml.example` for reference.
 ---
 ## Creating Dashboards
 
-  Example YAML structure:
-  ```yaml
-  schema: v2
-  name: My Dashboard
-  tags: []
-  version: v25.04.20
-  grid_rows:
-    - title: General
-      items:
-        - title: Metric name
-          width: 12
-          height: 28
-          type: chart
-          metrics:
-            - metric_name as $var
-          query:
-            - sum($var)
+**IMPORTANT:** Before creating a dashboard, use `get_dashboard_yaml` on an existing dashboard to see the exact format. Only use fields shown below — the API strictly rejects unknown fields.
+
+### Minimal example
+
+```yaml
+schema: v2
+name: "HTTP: Server"
+tags:
+- otel
+- app
+grid_rows:
+- title: Overview
+  items:
+  - title: Request Rate
+    width: 12
+    height: 28
+    type: chart
+    metrics:
+    - http_server_duration as $dur
+    query:
+    - perMin(count($dur{}))
+```
+
+### Full YAML structure reference
+
+```yaml
+schema: v2                    # Required: v2 or v3
+name: "Dashboard Name"        # Required
+tags:                          # Optional: string labels
+- otel
+- app
+version: v25.04.20            # Optional
+
+# Table section (summary table at top of dashboard)
+table:
+- metrics:
+  - metric_name as $var
+  query:
+  - perMin(count($var{})) as rate
+  - p90($var{}) as p90
+  - group by service_name::str
+  overrides:                   # Table column overrides
+  - column: p90                # Must match a query alias
+    properties:
+    - name: unit
+      value: milliseconds
+
+# Table grid items (optional gauge widgets above the table)
+table_grid_items:
+- title: Request Rate
+  width: 3                     # Gauges typically use width: 3
+  height: 10                   # Gauges typically use height: 10
+  type: gauge
+  metrics:
+  - metric_name as $var
+  query:
+  - perMin(count($var{})) as rate
+  overrides:                   # Uses column format (NOT matchers)
+  - column: rate               # REQUIRED: must match a query alias
+    properties:
+    - name: unit
+      value: utilization
+
+# Grid section (charts and gauges)
+grid_rows:
+- title: Section Title
+  items:
+  - title: Chart Title
+    width: 12                  # Standard: 12 (half), 24 (full), 3 (gauge)
+    height: 28                 # Standard: 28 (chart), 10 (gauge), 40 (heatmap/table)
+    x_axis: 12                 # Optional: horizontal offset (12 = right column)
+    y_axis: 28                 # Optional: vertical offset (multiples of height)
+    type: chart                # chart | gauge | table | heatmap
+    metrics:
+    - metric_name as $var
+    query:
+    - perMin(count($var{}))
+    properties:                 # Chart-level properties
+    - name: fillOpacity         # Only known property for charts
+      value: 0.1
+    overrides:                  # Per-metric overrides
+    - matchers:                 # Match by metric alias
+      - title: "metric:alias"
+        target: metric
+        value: alias
+      properties:
+      - name: unit
+        value: milliseconds
+```
+
+### Key rules
+
+- **No unknown fields.** The API rejects any field not in the schema. Use `get_dashboard_yaml` on an existing dashboard to verify the format.
+- **`overrides` format differs** by context:
+  - **Table overrides**: `column` (required) + `properties` — match by query alias
+  - **`table_grid_items` overrides**: `column` (required) + `properties` — same as table, `column` must match a query alias
+  - **Grid item overrides** (in `grid_rows`): `matchers` + `properties` — match by metric alias
+- **`properties` and `overrides`** are arrays of `{name, value}` pairs, never bare key-value maps.
+- **Sparkline** cannot be set via the YAML create/update API. Do NOT include `sparkline` in overrides.
+- **Empty arrays** (`properties: []`, `overrides: []`) are valid and can be omitted.
+- **Only known chart property**: `fillOpacity: 0.1` (for stacked/area charts).
+
+### Unit values
+
+`utilization`, `bytes`, `milliseconds`, `microseconds`, `nanoseconds`, `seconds`, `"1"` (dimensionless),
+`log/min`, `span/min`, `req/min`, `call/min`, `query/min`, `services`, `hosts`
+
+### Layout conventions
+
+- **Two-column layout**: width 12 + `x_axis: 12` for side-by-side charts
+- **Three-column layout**: width 8 + `x_axis: 8` + `x_axis: 16`
+- **Gauge row**: width 3 + `x_axis: 3, 6, 9, 12, 15` (up to 8 gauges)
+- **Vertical stacking**: `y_axis` increments by item height (28 for charts, 10 for gauges)
+
+### Aggregate functions
+
+- `sum($var{})` — counter/gauge metrics
+- `perMin(sum($var{}))` — rate of counters
+- `count($var{})` — histogram/duration metrics only
+- `perMin(count($var{}))` — rate of histograms
+- `avg($var{})` — averages
+- `p50()`, `p90()`, `p99()` — latency percentiles (duration/histogram metrics only)
+- `max()`, `min()` — extremes
+- `uniq($var{}, attr)` — count distinct values of an attribute
+
+### Metric types and allowed functions
+
+**Duration/histogram metrics** (e.g. `http_server_duration`, `go_sql_query_timing`, `rpc_server_duration`):
+- `count()`, `perMin(count())`, `avg()`, `p50()`, `p90()`, `p99()`, `max()`, `min()`
+
+**Counter/span metrics** (e.g. `uptrace_tracing_spans`, `uptrace_tracing_logs`, `redis_commands`):
+- `sum()`, `perMin(sum())` — for rates and totals
+- `uniq($var{}, attr)` — to count distinct values (e.g. `uniq($spans{}, service_name::str)`)
+- Do NOT use `count()`, `p50()`, `p90()`, `p99()` on span/counter metrics — they will error with "count is not supported for span metrics, use uniq instead"
+
+**Gauge metrics** (e.g. `system_memory_usage`, `redis_memory_rss`, `redis_db_keys`):
+- `sum()`, `avg()`, `max()`, `min()`
+
+### Tags
+
+Simple string labels for categorizing dashboards. Common tags:
+`otel`, `app`, `db`, `infra`, `logs`, `tracing`, `network`, `self_monitoring`
 ## Development
 
 ```bash

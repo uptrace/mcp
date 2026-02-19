@@ -3,7 +3,7 @@
 package uptraceapi
 
 import (
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 // CreateAnnotationRequestOptions is the options needed to make a request to CreateAnnotation.
@@ -844,9 +844,54 @@ func (o *ListDashboardsRequestOptions) GetHeader() (map[string]string, error) {
 	return nil, nil
 }
 
+// ListDashboardTagsRequestOptions is the options needed to make a request to ListDashboardTags.
+type ListDashboardTagsRequestOptions struct {
+	PathParams *ListDashboardTagsPath
+}
+
+// Validate validates all the fields in the options.
+// Use it if fields validation was not run.
+func (o *ListDashboardTagsRequestOptions) Validate() error {
+	var errors runtime.ValidationErrors
+
+	if o.PathParams != nil {
+		if v, ok := any(o.PathParams).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("PathParams", err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+
+	return errors
+}
+
+// GetPathParams returns the path params as a map.
+func (o *ListDashboardTagsRequestOptions) GetPathParams() (map[string]any, error) {
+	return runtime.AsMap[any](o.PathParams)
+}
+
+// GetQuery returns the query params as a map.
+func (o *ListDashboardTagsRequestOptions) GetQuery() (map[string]any, error) {
+	return nil, nil
+}
+
+// GetBody returns the payload in any type that can be marshalled to JSON by the client.
+func (o *ListDashboardTagsRequestOptions) GetBody() any {
+	return nil
+}
+
+// GetHeader returns the headers as a map.
+func (o *ListDashboardTagsRequestOptions) GetHeader() (map[string]string, error) {
+	return nil, nil
+}
+
 // CreateDashboardFromYAMLRequestOptions is the options needed to make a request to CreateDashboardFromYAML.
 type CreateDashboardFromYAMLRequestOptions struct {
 	PathParams *CreateDashboardFromYAMLPath
+	Body       *CreateDashboardFromYAMLBody
 }
 
 // Validate validates all the fields in the options.
@@ -858,6 +903,14 @@ func (o *CreateDashboardFromYAMLRequestOptions) Validate() error {
 		if v, ok := any(o.PathParams).(runtime.Validator); ok {
 			if err := v.Validate(); err != nil {
 				errors = errors.Append("PathParams", err)
+			}
+		}
+	}
+
+	if o.Body != nil {
+		if v, ok := any(o.Body).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("Body", err)
 			}
 		}
 	}
@@ -880,7 +933,7 @@ func (o *CreateDashboardFromYAMLRequestOptions) GetQuery() (map[string]any, erro
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
 func (o *CreateDashboardFromYAMLRequestOptions) GetBody() any {
-	return nil
+	return o.Body
 }
 
 // GetHeader returns the headers as a map.
@@ -1023,6 +1076,7 @@ func (o *GetDashboardYAMLRequestOptions) GetHeader() (map[string]string, error) 
 // UpdateDashboardFromYAMLRequestOptions is the options needed to make a request to UpdateDashboardFromYAML.
 type UpdateDashboardFromYAMLRequestOptions struct {
 	PathParams *UpdateDashboardFromYAMLPath
+	Body       *UpdateDashboardFromYAMLBody
 }
 
 // Validate validates all the fields in the options.
@@ -1034,6 +1088,14 @@ func (o *UpdateDashboardFromYAMLRequestOptions) Validate() error {
 		if v, ok := any(o.PathParams).(runtime.Validator); ok {
 			if err := v.Validate(); err != nil {
 				errors = errors.Append("PathParams", err)
+			}
+		}
+	}
+
+	if o.Body != nil {
+		if v, ok := any(o.Body).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("Body", err)
 			}
 		}
 	}
@@ -1056,7 +1118,7 @@ func (o *UpdateDashboardFromYAMLRequestOptions) GetQuery() (map[string]any, erro
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
 func (o *UpdateDashboardFromYAMLRequestOptions) GetBody() any {
-	return nil
+	return o.Body
 }
 
 // GetHeader returns the headers as a map.

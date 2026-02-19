@@ -150,6 +150,12 @@ type ListDashboardsResponse struct {
 
 type ListDashboardsErrorResponse = BadRequest
 
+type ListDashboardTagsResponse struct {
+	Tags []string `json:"tags" validate:"required"`
+}
+
+type ListDashboardTagsErrorResponse = BadRequest
+
 type CreateDashboardFromYAMLResponse = DashboardResponse
 
 type CreateDashboardFromYAMLErrorResponse = BadRequest
@@ -166,7 +172,7 @@ type GetDashboardErrorResponse = BadRequest
 
 type DeleteDashboardErrorResponse = BadRequest
 
-type GetDashboardYAMLResponse = string
+type GetDashboardYAMLResponse = []byte
 
 type GetDashboardYAMLErrorResponse = BadRequest
 

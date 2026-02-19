@@ -24,7 +24,7 @@ var Operations = map[string]OperationDescription{
 	},
 	"createDashboardFromYAML": {
 		Summary:     "Create dashboard from YAML",
-		Description: "Create a new dashboard from YAML definition. Use this to create visualization dashboards for spans, events, logs, and metrics. Supports grid-based and table-based layouts with PromQL-style metric queries. The YAML body must include: schema (v2 or v3) and name. Optional fields: version, tags. Use list_dashboards and get_dashboard to inspect existing dashboards as examples. Documentation: https://uptrace.dev/features/dashboards",
+		Description: "Create a new dashboard from YAML definition. Use this to create visualization dashboards for spans, events, logs, and metrics. Supports grid-based and table-based layouts with PromQL-style metric queries. The YAML body must include: schema (v2 or v3) and name. Optional fields: version, tags. Use get_dashboard_yaml on an existing dashboard to see the exact YAML format before creating. The API strictly rejects unknown fields. Table and table_grid_items overrides use column (required, must match a query alias) + properties (array of {name, value}). Grid item overrides (in grid_rows) use matchers + properties (array of {name, value}). Sparkline is a table column property ({name: sparkline, value: true}), not a top-level field. Documentation: https://uptrace.dev/features/dashboards",
 	},
 	"createGridItem": {
 		Summary:     "Create grid item",
@@ -77,6 +77,10 @@ var Operations = map[string]OperationDescription{
 	"getNotificationChannel": {
 		Summary:     "Get notification channel",
 		Description: "Retrieve a specific notification channel by ID.",
+	},
+	"listDashboardTags": {
+		Summary:     "List dashboard tags",
+		Description: "List all available dashboard tags for a project. Tags are simple string labels used for categorizing and filtering dashboards. Use these tags when creating new dashboards to ensure consistent categorization.",
 	},
 	"listDashboards": {
 		Summary:     "List dashboards",
@@ -148,7 +152,7 @@ var Operations = map[string]OperationDescription{
 	},
 	"updateDashboardFromYAML": {
 		Summary:     "Update dashboard from YAML",
-		Description: "Update an existing dashboard from YAML definition.",
+		Description: "Update an existing dashboard from YAML definition. Use get_dashboard_yaml first to retrieve the current YAML, then modify and submit. The API strictly rejects unknown fields. Table overrides use column + properties (array of {name, value}). Grid item overrides use matchers + properties (array of {name, value}). Documentation: https://uptrace.dev/features/dashboards",
 	},
 	"updateDashboardGrid": {
 		Summary:     "Update dashboard grid query",

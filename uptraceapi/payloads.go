@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/yorunikakeru4/oapi-codegen-dd/v3/pkg/runtime"
+	"github.com/uptrace/oapi-codegen-dd/v3/pkg/runtime"
 )
 
 type CreateAnnotationBody = AnnotationCreateRequest
@@ -123,6 +123,12 @@ func (u *UpdateMonitorBody) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+// CreateDashboardFromYAMLBody YAML dashboard definition.
+type CreateDashboardFromYAMLBody = string
+
+// UpdateDashboardFromYAMLBody YAML dashboard definition.
+type UpdateDashboardFromYAMLBody = string
 
 type UpdateDashboardTableBody = DashboardTableUpdate
 
