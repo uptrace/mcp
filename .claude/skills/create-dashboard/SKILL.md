@@ -4,97 +4,169 @@ description: Create an Uptrace monitoring dashboard by discovering metrics, anal
 argument-hint: [description of what to monitor]
 ---
 
-# Create Uptrace Dashboard
+# Uptrace Dashboard Creation
 
-Create a monitoring dashboard in Uptrace for: **$ARGUMENTS**
+This skill creates monitoring dashboards in Uptrace by discovering available metrics, analyzing their attributes, and generating valid YAML definitions. It handles the full workflow from metric discovery to dashboard creation and verification.
 
 IMPORTANT: Call all Uptrace MCP tools directly. Do NOT delegate to subagents or Task tools — they do not have access to MCP tools.
 
-## Workflow
+## When to Use This Skill
 
-Follow these steps in order:
+- Creating a new monitoring dashboard for a service or library
+- Visualizing metrics from OpenTelemetry instrumentation
+- Building overview dashboards with charts, gauges, and tables
+- Monitoring specific subsystems (HTTP, database, Redis, runtime, etc.)
 
-### 1. Discover Metrics
+## What This Skill Does
 
-Use `list_span_groups` to find relevant metrics:
-- Use the `search` parameter to find metrics matching the user's request (e.g. search="http", search="redis")
-- Use `group by _name` to list metric names
-- Set a system filter if the domain is known (e.g. `where system = 'db:postgresql'`)
-- To find metrics from a specific library, filter by `library_name`
+1. **Discovers metrics** using `explore_metrics` — finds available metrics with instrument types, units, and attributes
+2. **Analyzes attributes** using `list_metric_attributes` / `list_metric_attribute_values` — identifies grouping dimensions
+3. **Groups by library** — metrics from the same `libraryName` share attributes and belong on one dashboard
+4. **Generates YAML** — produces valid dashboard YAML following the strict schema
+5. **Creates and verifies** — submits via `create_dashboard` and verifies with `get_dashboard_yaml`
 
-### 2. Analyze Attributes
+## How to Use
 
-For each discovered metric:
-- Use `list_span_groups` with `group by` to discover available attributes (e.g. `group by host_name, service_name`)
-- Identify metrics that share the same attributes — these can be combined in table views
-- Use `query_timeseries` to preview metric data if needed
+Create a monitoring dashboard in Uptrace for: **$ARGUMENTS**
 
-### 3. Fetch Available Tags
+### Workflow
 
-Call `list_dashboard_tags` to get all available tags for the project.
-Select the most relevant tags for this dashboard.
+1. `explore_metrics` — discover metrics, group by `libraryName`
+2. `list_metric_attributes` / `list_metric_attribute_values` — find grouping attributes
+3. `list_dashboard_tags` — get available tags
+4. `get_dashboard_yaml` on a similar dashboard — learn the exact format
+5. `create_dashboard` — submit YAML
+6. `get_dashboard_yaml` — verify result
 
-### 4. Study Existing Dashboards
+## Instructions
 
-1. Call `list_dashboards` to find similar existing dashboards
-2. Call `get_dashboard_yaml` on 1-2 relevant dashboards to learn the exact YAML format
-3. Use these as templates for structure, query syntax, and layout patterns
+### Metric Discovery
 
-### 5. Generate Dashboard YAML
+Uptrace metrics come from [OpenTelemetry instrumentation](https://uptrace.dev/opentelemetry/metrics) — each metric is produced by an instrument (Counter, Histogram, Gauge, UpDownCounter) and carries attributes (key-value pairs like `http.method=GET`). See [Querying Metrics](https://uptrace.dev/features/querying/metrics) for the full query language reference.
 
-Build the YAML using the patterns learned from existing dashboards. Key format:
+#### Searching metrics with `explore_metrics`
+
+Use `explore_metrics` with the `search` parameter to filter metrics by name. The search is a substring match on the metric name:
+
+- `search="http"` — finds `http_server_duration`, `http_client_duration`, etc.
+- `search="redis"` — finds `redis_commands`, `redis_memory_rss`, `redis_db_keys`, etc.
+- `search="go_sql"` — finds `go_sql_query_timing`, `go_sql_open_connections`, etc.
+- `search=""` (empty or omitted) — returns all available metrics
+
+Each metric in the response contains:
+
+- **`name`** — metric name (e.g. `http_server_duration`)
+- **`instrument`** — OpenTelemetry instrument type that determines which aggregate functions are allowed: `histogram`, `counter`, `gauge`, `additive`. Check the "Aggregate Functions by Instrument Type" section to pick the correct functions.
+- **`unit`** — metric unit (e.g. `milliseconds`, `bytes`). Use this to set the `unit` property in overrides.
+- **`description`** — what the metric measures
+- **`attrKeys`** — all available attributes with type suffixes (e.g. `service_name::str`, `http_status_code::int`). Use these for `group by` clauses and `$var{attr="value"}` filters in queries.
+- **`libraryName`** — the OpenTelemetry instrumentation library that produces this metric (e.g. `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp`). This is the OTel [instrumentation scope](https://uptrace.dev/opentelemetry/metrics) name.
+- **`numTimeseries`** — number of active timeseries (helps gauge metric cardinality)
+
+**Dashboards are built from metrics that share the same `libraryName`.** Group discovered metrics by `libraryName` — metrics from the same library share the same attributes and belong on one dashboard. For example, all Redis metrics come from `opentelemetry-collector-contrib/receiver/redisreceiver`, all HTTP server metrics from `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp`.
+
+#### Finding attributes with `list_metric_attributes` and `list_metric_attribute_values`
+
+Use `list_metric_attributes` (with optional `search` to filter by metric name) to see attribute keys with usage counts — helpful for finding common `group by` attributes for dashboard tables.
+
+Use `list_metric_attribute_values` with a specific `attr_key` including the type suffix (e.g. `host_name::str`, `http_status_code::int`) to check actual values for filtering (e.g. `$var{service_name="myservice"}`).
+
+### Aggregate Functions by Instrument Type
+
+- **histogram** — `count()`, `perMin(count())`, `avg()`, `p50()`, `p90()`, `p99()`, `max()`, `min()`
+- **counter** — `sum()`, `perMin(sum())`
+- **gauge** — `sum()`, `avg()`, `max()`, `min()`
+- **additive** — `sum()`, `perMin(sum())`
+
+**CRITICAL:** Do NOT use `count()`, `p50()`, `p90()`, `p99()` on counter/gauge/additive metrics — they will error with "count is not supported for span metrics".
+
+### Dashboard YAML Format
+
+Call `get_dashboard_yaml` on an existing dashboard to understand the structure. **WARNING:** The output contains read-only properties (`sparkline`, `color`, `aggFunc`) that the API **rejects on create/update**. Do NOT copy these properties — only use `unit` in overrides.
 
 ```yaml
 schema: v2
 name: "Dashboard Name"
 tags:
-- tag1
-- tag2
-version: v25.04.20
+- otel
+- app
+
 table:
 - metrics:
   - metric_name as $var
   query:
-  - perMin(count($var{})) as rate
-  - p90($var{}) as dur_p90
+  - perMin(sum($var{})) as rate
   - group by service_name::str
+  overrides:
+  - column: rate              # REQUIRED: must match a query alias
+    properties:
+    - name: unit
+      value: bytes
+
+table_grid_items:             # Optional: gauge widgets above the table
+- title: Total Rate
+  width: 3
+  height: 10
+  type: gauge
+  metrics:
+  - metric_name as $var
+  query:
+  - perMin(sum($var{})) as rate
+  overrides:                  # Same column format as table
+  - column: rate
+    properties:
+    - name: unit
+      value: req/min
+
 grid_rows:
-  - title: Section Title
-    items:
-      - title: Chart Title
-        width: 6          # 12=full, 6=half, 4=third, 3=quarter
-        height: 28         # 28 for charts, 10 for gauges
-        type: chart        # chart, table, or gauge
-        metrics:
-          - metric_name as $var
-        query:
-          - perMin(count($var{}))
+- title: Section Title
+  items:
+  - title: Chart Title
+    width: 12                 # 12=half, 24=full, 3=gauge
+    height: 28                # 28=chart, 10=gauge, 40=heatmap
+    type: chart               # chart | gauge | table | heatmap
+    metrics:
+    - metric_name as $var
+    query:
+    - perMin(sum($var{}))
+    properties:               # Only known: fillOpacity
+    - name: fillOpacity
+      value: 0.1
+    overrides:                # Grid items use matchers format
+    - matchers:
+      - title: "metric:alias"
+        target: metric
+        value: alias
+      properties:
+      - name: unit
+        value: bytes
 ```
 
-Syntax rules:
-- `metrics`: "metric_name as $variable"
-- `query`: aggregations — sum, avg, min, max, count, uniq, perMin, p50, p75, p90, p95, p99
-- `group by`: separate query line — "group by attr_name::str"
-- `filter`: curly braces — $var{status_code>=400}
+### Critical Rules
 
-**Important — count vs sum:**
-- Use `count($var{})` for **duration/histogram metrics** (e.g. `http_server_duration`, `rpc_server_duration`) — counts the number of recorded measurements
-- Use `sum($var{})` for **counter/span metrics** (e.g. `uptrace_tracing_spans`, `uptrace_tracing_logs`, `redis_keyspace_hits`) — sums pre-aggregated counter values
-- `count` is NOT supported for span/counter metrics; `uniq` requires a specific attribute argument (e.g. `uniq($var{}, attr_name)`)
+- **No unknown fields** — the API rejects any field not in the schema
+- **Override formats differ by context:**
+  - Table / `table_grid_items`: `column` (required, must match query alias) + `properties`
+  - Grid items (in `grid_rows`): `matchers` + `properties`
+- **Properties** are arrays of `{name, value}` pairs, never bare key-value maps
+- **Do NOT copy read-only properties from `get_dashboard_yaml` output.** The following properties appear in read output but are **rejected on create/update**:
+  - `sparkline` — never include in overrides
+  - `color` — never include (e.g. `name: color, value: ""`)
+  - `aggFunc` — never include (e.g. `name: aggFunc, value: ""`)
+- **Only include `unit` property** in table/table_grid_items overrides. For grid item overrides, only `unit` is needed.
+- **Unit values:** `utilization`, `bytes`, `milliseconds`, `microseconds`, `nanoseconds`, `seconds`, `"1"`, `req/min`, `span/min`, `log/min`, `call/min`, `query/min`
 
-### 6. Create the Dashboard
+### Layout Reference
 
-Call `create_dashboard` with the generated YAML body.
-
-### 7. Verify
-
-Call `get_dashboard_yaml` with the returned dashboard ID to verify it was created correctly.
-If issues are found, use `update_dashboard_yaml` to fix them.
+- **Two-column:** width `12` + `x_axis: 12`
+- **Three-column:** width `8` + `x_axis: 8` + `x_axis: 16`
+- **Gauge row:** width `3`, height `10`, `x_axis: 3, 6, 9, 12, 15`
+- **Vertical stacking:** `y_axis` increments by item height (28 for charts, 10 for gauges)
 
 ## Output
 
 After creating the dashboard, explain:
-1. The list of selected metrics and what each one measures
-2. How metrics were grouped and why
-3. What each dashboard section/visualization shows
-4. Which tags were applied and why
+1. Selected metrics, their instrument types, and what each measures
+2. How metrics were grouped (by `libraryName`) and why
+3. What each dashboard section shows
+4. Which tags were applied
