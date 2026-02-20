@@ -277,8 +277,8 @@ type ExploredMetric struct {
 	// Name Metric name.
 	Name string `json:"name" jsonschema:"Metric name." validate:"required"`
 
-	// Instrument Instrument type: histogram, counter, gauge, or additive.
-	Instrument string `json:"instrument" jsonschema:"Instrument type: histogram, counter, gauge, or additive." validate:"required"`
+	// Instrument OpenTelemetry instrument type.
+	Instrument ExploredMetricInstrument `json:"instrument" jsonschema:"OpenTelemetry instrument type." validate:"required"`
 
 	// Unit Metric unit.
 	Unit *string `json:"unit,omitempty" jsonschema:"Metric unit."`
@@ -300,7 +300,19 @@ type ExploredMetric struct {
 }
 
 func (e ExploredMetric) Validate() error {
-	return runtime.ConvertValidatorError(typesValidator.Struct(e))
+	var errors runtime.ValidationErrors
+	if err := typesValidator.Var(e.Name, "required"); err != nil {
+		errors = errors.Append("Name", err)
+	}
+	if v, ok := any(e.Instrument).(runtime.Validator); ok {
+		if err := v.Validate(); err != nil {
+			errors = errors.Append("Instrument", err)
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
 }
 
 type ListMetricAttributesResponse struct {
