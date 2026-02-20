@@ -156,6 +156,14 @@ type ListDashboardTagsResponse struct {
 
 type ListDashboardTagsErrorResponse = BadRequest
 
+type ListDashboardTemplatesResponseJSON = ListDashboardTemplatesResponse
+
+type ListDashboardTemplatesErrorResponse = BadRequest
+
+type GetDashboardTemplateResponseJSON = GetDashboardTemplateResponse
+
+type GetDashboardTemplateErrorResponse = BadRequest
+
 type ExploreMetricsResponseJSON = ExploreMetricsResponse
 
 type ExploreMetricsErrorResponse = BadRequest
@@ -168,9 +176,9 @@ type ListMetricAttributeValuesResponseJSON = ListMetricAttributeValuesResponse
 
 type ListMetricAttributeValuesErrorResponse = BadRequest
 
-type CreateDashboardFromYAMLResponse = DashboardResponse
+type CreateDashboardFromYamlResponse = DashboardResponse
 
-type CreateDashboardFromYAMLErrorResponse = BadRequest
+type CreateDashboardFromYamlErrorResponse = BadRequest
 
 type GetDashboardResponse struct {
 	Dashboard   Dashboard  `json:"dashboard"`
@@ -184,13 +192,13 @@ type GetDashboardErrorResponse = BadRequest
 
 type DeleteDashboardErrorResponse = BadRequest
 
-type GetDashboardYAMLResponse = []byte
+type GetDashboardYamlResponse = []byte
 
-type GetDashboardYAMLErrorResponse = BadRequest
+type GetDashboardYamlErrorResponse = BadRequest
 
-type UpdateDashboardFromYAMLResponse = DashboardResponse
+type UpdateDashboardFromYamlResponse = DashboardResponse
 
-type UpdateDashboardFromYAMLErrorResponse = BadRequest
+type UpdateDashboardFromYamlErrorResponse = BadRequest
 
 type CloneDashboardResponse = DashboardResponse
 

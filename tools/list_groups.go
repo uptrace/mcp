@@ -30,7 +30,7 @@ func (t *ListSpanGroupsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["listSpanGroups"].Description,
+		Description: uptraceapi.Operations["list_span_groups"].Description,
 	}, t.handler)
 }
 
@@ -46,11 +46,11 @@ func (t *ListSpanGroupsTool) handler(
 	if input.Query == nil {
 		input.Query = &uptraceapi.ListSpanGroupsQuery{}
 	}
-	if input.Query.TimeGte.IsZero() {
-		input.Query.TimeGte = time.Now().Add(-time.Hour)
+	if input.Query.TimeStart.IsZero() {
+		input.Query.TimeStart = time.Now().Add(-t.conf.Default.TimeDuration)
 	}
-	if input.Query.TimeLt.IsZero() {
-		input.Query.TimeLt = time.Now()
+	if input.Query.TimeEnd.IsZero() {
+		input.Query.TimeEnd = time.Now()
 	}
 	if input.Query.Limit == nil {
 		defaultLimit := uptraceapi.Limit(t.conf.Default.Limit)

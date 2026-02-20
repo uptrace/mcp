@@ -29,7 +29,7 @@ func (t *GetDashboardTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["getDashboard"].Description,
+		Description: uptraceapi.Operations["get_dashboard"].Description,
 	}, t.handler)
 }
 

@@ -18,11 +18,11 @@ type TimeEnd = time.Time
 type Limit = int32
 
 type PublicListSpansQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// TraceID Filter spans by trace ID.
 	TraceID *string `json:"trace_id,omitempty" jsonschema:"Filter spans by trace ID."`
@@ -42,11 +42,11 @@ func (p PublicListSpansQuery) Validate() error {
 }
 
 type PublicListSpanGroupsQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query Aggregate spans using the specified query.
 	Query *string `json:"query,omitempty" jsonschema:"Aggregate spans using the specified query."`
@@ -69,11 +69,11 @@ func (p PublicListSpanGroupsQuery) Validate() error {
 }
 
 type ListSpansQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL query to filter spans (e.g., where service_name = 'myservice').
 	Query *string `json:"query,omitempty" jsonschema:"UQL query to filter spans (e.g., where service_name = 'myservice')."`
@@ -108,11 +108,11 @@ type ListSpansQuery struct {
 
 func (l ListSpansQuery) Validate() error {
 	var errors runtime.ValidationErrors
-	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
-		errors = errors.Append("TimeGte", err)
+	if err := typesValidator.Var(l.TimeStart, "required"); err != nil {
+		errors = errors.Append("TimeStart", err)
 	}
-	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
-		errors = errors.Append("TimeLt", err)
+	if err := typesValidator.Var(l.TimeEnd, "required"); err != nil {
+		errors = errors.Append("TimeEnd", err)
 	}
 	for i, item := range l.SortDir {
 		if v, ok := any(item).(runtime.Validator); ok {
@@ -128,11 +128,11 @@ func (l ListSpansQuery) Validate() error {
 }
 
 type ListSpanGroupsQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL aggregation query (e.g., perMin(count()) | group by host_name).
 	Query *string `json:"query,omitempty" jsonschema:"UQL aggregation query (e.g., perMin(count()) | group by host_name)."`
@@ -167,11 +167,11 @@ type ListSpanGroupsQuery struct {
 
 func (l ListSpanGroupsQuery) Validate() error {
 	var errors runtime.ValidationErrors
-	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
-		errors = errors.Append("TimeGte", err)
+	if err := typesValidator.Var(l.TimeStart, "required"); err != nil {
+		errors = errors.Append("TimeStart", err)
 	}
-	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
-		errors = errors.Append("TimeLt", err)
+	if err := typesValidator.Var(l.TimeEnd, "required"); err != nil {
+		errors = errors.Append("TimeEnd", err)
 	}
 	for i, item := range l.SortDir {
 		if v, ok := any(item).(runtime.Validator); ok {
@@ -187,11 +187,11 @@ func (l ListSpanGroupsQuery) Validate() error {
 }
 
 type QueryTimeseriesQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL aggregation query (e.g., perMin(count()) | group by service_name).
 	Query *string `json:"query,omitempty" jsonschema:"UQL aggregation query (e.g., perMin(count()) | group by service_name)."`
@@ -226,11 +226,11 @@ func (q QueryTimeseriesQuery) Validate() error {
 }
 
 type QueryQuantilesQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL query to filter spans (e.g., where service_name = 'myservice').
 	Query *string `json:"query,omitempty" jsonschema:"UQL query to filter spans (e.g., where service_name = 'myservice')."`
@@ -262,11 +262,11 @@ func (q QueryQuantilesQuery) Validate() error {
 }
 
 type ListTraceGroupsQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL query for each sub-query. Must have the same count as alias and system. Can be repeated.
 	Query []string `json:"query,omitempty" jsonschema:"UQL query for each sub-query. Must have the same count as alias and system. Can be repeated."`
@@ -289,11 +289,11 @@ type ListTraceGroupsQuery struct {
 
 func (l ListTraceGroupsQuery) Validate() error {
 	var errors runtime.ValidationErrors
-	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
-		errors = errors.Append("TimeGte", err)
+	if err := typesValidator.Var(l.TimeStart, "required"); err != nil {
+		errors = errors.Append("TimeStart", err)
 	}
-	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
-		errors = errors.Append("TimeLt", err)
+	if err := typesValidator.Var(l.TimeEnd, "required"); err != nil {
+		errors = errors.Append("TimeEnd", err)
 	}
 	for i, item := range l.SortDir {
 		if v, ok := any(item).(runtime.Validator); ok {
@@ -309,11 +309,11 @@ func (l ListTraceGroupsQuery) Validate() error {
 }
 
 type ListTracesQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Query UQL query for each sub-query. Must have the same count as alias and system. Can be repeated.
 	Query []string `json:"query,omitempty" jsonschema:"UQL query for each sub-query. Must have the same count as alias and system. Can be repeated."`
@@ -336,11 +336,11 @@ type ListTracesQuery struct {
 
 func (l ListTracesQuery) Validate() error {
 	var errors runtime.ValidationErrors
-	if err := typesValidator.Var(l.TimeGte, "required"); err != nil {
-		errors = errors.Append("TimeGte", err)
+	if err := typesValidator.Var(l.TimeStart, "required"); err != nil {
+		errors = errors.Append("TimeStart", err)
 	}
-	if err := typesValidator.Var(l.TimeLt, "required"); err != nil {
-		errors = errors.Append("TimeLt", err)
+	if err := typesValidator.Var(l.TimeEnd, "required"); err != nil {
+		errors = errors.Append("TimeEnd", err)
 	}
 	for i, item := range l.SortDir {
 		if v, ok := any(item).(runtime.Validator); ok {
@@ -356,11 +356,11 @@ func (l ListTracesQuery) Validate() error {
 }
 
 type ExploreMetricsQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Search Search string to filter metrics by name.
 	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`
@@ -371,11 +371,11 @@ func (e ExploreMetricsQuery) Validate() error {
 }
 
 type ListMetricAttributesQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Search Search string to filter metrics by name.
 	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`
@@ -386,11 +386,11 @@ func (l ListMetricAttributesQuery) Validate() error {
 }
 
 type ListMetricAttributeValuesQuery struct {
-	// TimeGte Start time (inclusive) as RFC3339 timestamp.
-	TimeGte TimeStart `json:"time_gte" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeStart Start time (inclusive) as RFC3339 timestamp.
+	TimeStart TimeStart `json:"time_start" jsonschema:"Start time (inclusive) as RFC3339 timestamp." validate:"required"`
 
-	// TimeLt End time (exclusive) as RFC3339 timestamp.
-	TimeLt TimeEnd `json:"time_lt" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
+	// TimeEnd End time (exclusive) as RFC3339 timestamp.
+	TimeEnd TimeEnd `json:"time_end" jsonschema:"End time (exclusive) as RFC3339 timestamp." validate:"required"`
 
 	// Search Search string to filter metrics by name.
 	Search *string `json:"search,omitempty" jsonschema:"Search string to filter metrics by name."`

@@ -29,7 +29,7 @@ func (t *ListMetricAttributesTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["listMetricAttributes"].Description,
+		Description: uptraceapi.Operations["list_metric_attributes"].Description,
 	}, t.handler)
 }
 

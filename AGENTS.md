@@ -199,6 +199,8 @@ This server exposes the following MCP tools:
 | `create_dashboard` | Create a dashboard from YAML definition |
 | `list_dashboards` | List all dashboards |
 | `list_dashboard_tags` | List available dashboard tags for a project |
+| `list_dashboard_templates` | List available built-in dashboard templates |
+| `get_dashboard_template` | Get a specific dashboard template by ID |
 | `get_dashboard` | Get dashboard details by ID |
 | `get_dashboard_yaml` | Get dashboard YAML definition by ID |
 | `update_dashboard_yaml` | Update a dashboard from YAML definition |
@@ -226,6 +228,7 @@ default:
   project_id: 1
   query: "<your-query>"
   limit: 10
+  time_duration: 1h  # default time range for queries
 ```
 
 See `config.yaml.example` for reference.

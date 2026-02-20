@@ -5,6 +5,11 @@
 # logging:
 #   level: info  # optional, default: info (debug, info, warn, error)
 
+default:
+  # time_duration: 1h  # optional, default: 1h — default time range for queries
+  # limit: 10          # optional — default result limit
+  # query: ""          # optional — default UQL query
+
 uptrace:
   dsn: "https://<token>@api.uptrace.dev/<project_id>"
   api_url: "https://api.uptrace.dev"

@@ -15,8 +15,9 @@ type Config struct {
 	Uptrace UptraceConfig `yaml:"uptrace"`
 }
 type DefaultConfig struct {
-	Limit int    `yaml:"limit"`
-	Query string `yaml:"query"`
+	Limit        int           `yaml:"limit"`
+	Query        string        `yaml:"query"`
+	TimeDuration time.Duration `yaml:"time_duration"`
 }
 type ServiceConfig struct {
 	StartTimeout time.Duration `yaml:"start_timeout"`
@@ -65,5 +66,8 @@ func (c *Config) setDefaults() {
 	}
 	if c.Logging.Level == "" {
 		c.Logging.Level = "info"
+	}
+	if c.Default.TimeDuration == 0 {
+		c.Default.TimeDuration = time.Hour
 	}
 }
