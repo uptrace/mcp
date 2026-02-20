@@ -29,7 +29,7 @@ func (t *ListDashboardsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["listDashboards"].Description,
+		Description: uptraceapi.Operations["list_dashboards"].Description,
 	}, t.handler)
 }
 
