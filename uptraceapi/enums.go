@@ -43,6 +43,28 @@ func (o OrderItemOrder) Validate() error {
 	}
 }
 
+// ExploredMetricInstrument OpenTelemetry instrument type.
+type ExploredMetricInstrument string
+
+const (
+	Additive    ExploredMetricInstrument = "additive"
+	Counter     ExploredMetricInstrument = "counter"
+	Gauge       ExploredMetricInstrument = "gauge"
+	Histogram   ExploredMetricInstrument = "histogram"
+	PromCounter ExploredMetricInstrument = "prom-counter"
+	Summary     ExploredMetricInstrument = "summary"
+)
+
+// Validate checks if the ExploredMetricInstrument value is valid
+func (e ExploredMetricInstrument) Validate() error {
+	switch e {
+	case Additive, Counter, Gauge, Histogram, PromCounter, Summary:
+		return nil
+	default:
+		return runtime.NewValidationErrorsFromString("Enum", fmt.Sprintf("must be a valid ExploredMetricInstrument value, got: %v", e))
+	}
+}
+
 type OrgUserFixtureRole string
 
 const (
@@ -313,7 +335,7 @@ type GridItemType string
 
 const (
 	Chart             GridItemType = "chart"
-	Gauge             GridItemType = "gauge"
+	GridItemTypeGauge GridItemType = "gauge"
 	GridItemTypeTable GridItemType = "table"
 	Heatmap           GridItemType = "heatmap"
 )
@@ -321,7 +343,7 @@ const (
 // Validate checks if the GridItemType value is valid
 func (g GridItemType) Validate() error {
 	switch g {
-	case Chart, Gauge, GridItemTypeTable, Heatmap:
+	case Chart, GridItemTypeGauge, GridItemTypeTable, Heatmap:
 		return nil
 	default:
 		return runtime.NewValidationErrorsFromString("Enum", fmt.Sprintf("must be a valid GridItemType value, got: %v", g))
