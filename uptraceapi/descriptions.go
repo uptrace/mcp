@@ -10,183 +10,191 @@ type OperationDescription struct {
 
 // Operations maps operationId to its description from the OpenAPI spec.
 var Operations = map[string]OperationDescription{
-	"bindFixtureKeys": {
+	"bind_fixture_keys": {
 		Summary:     "Bind existing resources to fixture keys",
 		Description: "Assign fixture keys to existing resources created outside of fixtures.",
 	},
-	"cloneDashboard": {
+	"clone_dashboard": {
 		Summary:     "Clone a dashboard",
 		Description: "Create a copy of an existing dashboard.",
 	},
-	"createAnnotation": {
+	"create_annotation": {
 		Summary:     "Create annotation",
 		Description: "Create a chart annotation.",
 	},
-	"createDashboardFromYAML": {
+	"create_dashboard_from_yaml": {
 		Summary:     "Create dashboard from YAML",
 		Description: "Create a new dashboard from YAML definition. Use this to create visualization dashboards for spans, events, logs, and metrics. Supports grid-based and table-based layouts with PromQL-style metric queries. The YAML body must include: schema (v2 or v3) and name. Optional fields: version, tags. Use get_dashboard_yaml on an existing dashboard to see the exact YAML format before creating. The API strictly rejects unknown fields. Table and table_grid_items overrides use column (required, must match a query alias) + properties (array of {name, value}). Grid item overrides (in grid_rows) use matchers + properties (array of {name, value}). Sparkline is a table column property ({name: sparkline, value: true}), not a top-level field. Documentation: https://uptrace.dev/features/dashboards",
 	},
-	"createGridItem": {
+	"create_grid_item": {
 		Summary:     "Create grid item",
 		Description: "Create a new grid item in the dashboard.",
 	},
-	"createGridRow": {
+	"create_grid_row": {
 		Summary:     "Create grid row",
 		Description: "Create a new grid row in the dashboard.",
 	},
-	"createMonitor": {
+	"create_monitor": {
 		Summary:     "Create a monitor",
 		Description: "Create a metric or error monitor.",
 	},
-	"createNotificationChannel": {
+	"create_notification_channel": {
 		Summary:     "Create notification channel",
 		Description: "Create a new notification channel.",
 	},
-	"deleteDashboard": {
+	"delete_dashboard": {
 		Summary:     "Delete a dashboard",
 		Description: "Delete a dashboard by ID.",
 	},
-	"deleteGridItem": {
+	"delete_grid_item": {
 		Summary:     "Delete grid item",
 		Description: "Delete a grid item from the dashboard.",
 	},
-	"deleteGridRow": {
+	"delete_grid_row": {
 		Summary:     "Delete grid row",
 		Description: "Delete a grid row and all its items.",
 	},
-	"deleteMonitor": {
+	"delete_monitor": {
 		Summary:     "Delete a monitor",
 		Description: "Delete a metric or error monitor by ID.",
 	},
-	"deleteNotificationChannel": {
+	"delete_notification_channel": {
 		Summary:     "Delete notification channel",
 		Description: "Delete an existing notification channel.",
 	},
-	"exploreMetrics": {
+	"explore_metrics": {
 		Summary:     "Explore metrics",
 		Description: "Discover available metrics and their metadata. Returns metric names, instrument types (histogram, counter, gauge, additive), units, descriptions, available attributes, and library info. Use the instrument type to choose the correct aggregate function: histogram metrics support count(), p50(), p90(), p99(); counter metrics support sum(), perMin(sum()); gauge metrics support sum(), avg(), max(), min(); additive metrics support sum(), perMin(sum()). Use the search parameter to filter by metric name. Use this tool before creating dashboards to discover metrics and their attributes.",
 	},
-	"getDashboard": {
+	"get_dashboard": {
 		Summary:     "Get a dashboard",
 		Description: "Get a dashboard by ID from Uptrace. Use this to retrieve full dashboard details including grid rows, items, and metric queries. Requires a dashboard_id -- use list_dashboards first to find available dashboard IDs. Documentation: https://uptrace.dev/features/dashboards",
 	},
-	"getDashboardYAML": {
+	"get_dashboard_template": {
+		Summary:     "Get dashboard template",
+		Description: "Get a specific dashboard template by ID. Returns the template ID, name, description, and tags.",
+	},
+	"get_dashboard_yaml": {
 		Summary:     "Get dashboard YAML",
 		Description: "Retrieve the YAML representation of a dashboard.",
 	},
-	"getMonitor": {
+	"get_monitor": {
 		Summary:     "Get a monitor",
 		Description: "Retrieve a specific monitor by ID.",
 	},
-	"getNotificationChannel": {
+	"get_notification_channel": {
 		Summary:     "Get notification channel",
 		Description: "Retrieve a specific notification channel by ID.",
 	},
-	"listDashboardTags": {
+	"list_dashboard_tags": {
 		Summary:     "List dashboard tags",
 		Description: "List all available dashboard tags for a project. Tags are simple string labels used for categorizing and filtering dashboards. Use these tags when creating new dashboards to ensure consistent categorization.",
 	},
-	"listDashboards": {
+	"list_dashboard_templates": {
+		Summary:     "List dashboard templates",
+		Description: "List all available built-in dashboard templates. Returns template ID, name, and description for each template. Use this to discover available templates before creating dashboards.",
+	},
+	"list_dashboards": {
 		Summary:     "List dashboards",
 		Description: "List dashboards configured in Uptrace. Use this to browse available dashboards for monitoring and visualization. Returns dashboard summaries with ID, name, and tags. Use get_dashboard with a specific ID to retrieve full dashboard details including grid rows and items. Use create_dashboard to create a new dashboard from YAML. Documentation: https://uptrace.dev/features/dashboards",
 	},
-	"listMetricAttributeValues": {
+	"list_metric_attribute_values": {
 		Summary:     "List attribute values",
 		Description: "List values for a specific metric attribute key. Returns distinct attribute values with their occurrence count. Use the search parameter to filter by metric name.",
 	},
-	"listMetricAttributes": {
+	"list_metric_attributes": {
 		Summary:     "List metric attributes",
 		Description: "List available attribute keys for metrics. Returns attribute keys with their kind (str, int, float), unit, and count (how many metrics use each attribute). Use the search parameter to filter by metric name. Use this to discover which attributes are available for group by in dashboard queries.",
 	},
-	"listMonitors": {
+	"list_monitors": {
 		Summary:     "List monitors",
 		Description: "List monitoring rules and alerts configured in Uptrace. Use this to review alert configurations, check notification channels, and understand monitoring thresholds. Returns monitors with their type, state, query, and notification settings. Use list_dashboards instead when looking for visualization dashboards. Documentation: https://uptrace.dev/features/alerting",
 	},
-	"listNotificationChannels": {
+	"list_notification_channels": {
 		Summary:     "List notification channels",
 		Description: "Retrieve all notification channels for a project.",
 	},
-	"listSpanGroups": {
+	"list_span_groups": {
 		Summary:     "List groups",
 		Description: "Aggregate spans into groups using UQL queries. Use this to get aggregated metrics like request count, error rate, or latency percentiles. Aggregate functions: count(), avg(), sum(), min(), max(), p50(), p75(), p90(), p99(), uniq(), apdex(). Supports GROUP BY (e.g. group by service_name), HAVING (e.g. having p50(_dur_ms) > 100ms), WHERE filters, full-text search, system filtering (e.g. httpserver:all, db:postgresql), and duration filtering. Example query: 'perMin(count()) | group by host_name'. Returns grouped rows with dynamic columns based on the query. Use list_spans instead when you need individual span details. Use timeseries instead when you need time-bucketed data for charts. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"listSpans": {
+	"list_spans": {
 		Summary:     "List spans",
 		Description: "List individual spans using UQL (Uptrace Query Language). Use this to inspect specific span details, search for errors, or browse recent operations. Supports WHERE filters (e.g. where service_name = 'myservice', where _status_code = 'error', where _dur_ms > 100ms), full-text search (e.g. word1|word2 -excluded), system filtering (e.g. httpserver:all, db:postgresql, log:error), duration filtering in milliseconds, and sorting by any span field. Span fields use underscore prefix: _name, _dur_ms, _status_code, _time, _trace_id, _kind. Attributes use dot-to-underscore: service.name becomes service_name. Returns individual span objects with attrs, timing, and status. Use list_span_groups instead when you need aggregated metrics (count, avg, p99). Use list_traces instead when you need to find traces matching multi-span criteria. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"listTraceGroups": {
+	"list_trace_groups": {
 		Summary:     "List trace groups",
 		Description: "Aggregate traces into groups using correlated sub-queries. Use this to find trace patterns and get aggregated trace metrics. Requires parallel arrays: query[], alias[], system[] with matching lengths. One alias must be 'root' to identify the root span query. Additional sub-queries filter traces where child spans match specific criteria. Systems: spans:all, httpserver:all, db:postgresql, log:error, etc. Returns grouped rows with dynamic columns. Use list_traces instead when you need individual trace details. Use list_span_groups instead when you don't need cross-span trace correlation. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"listTraces": {
+	"list_traces": {
 		Summary:     "List traces",
 		Description: "List individual traces using correlated sub-queries. Use this to find specific traces matching complex multi-span criteria. Requires parallel arrays: query[], alias[], system[] with matching lengths. One alias must be 'root' to identify the root span query. Additional sub-queries filter traces where child spans match specific criteria. Systems: spans:all, httpserver:all, db:postgresql, log:error, etc. Returns root spans for matching traces sorted by time (DESC by default). Use list_trace_groups instead when you need aggregated trace metrics. Use list_spans instead when you don't need cross-span trace correlation. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"moveGridRowDown": {
+	"move_grid_row_down": {
 		Summary:     "Move grid row down",
 		Description: "Move a grid row down in the dashboard.",
 	},
-	"moveGridRowUp": {
+	"move_grid_row_up": {
 		Summary:     "Move grid row up",
 		Description: "Move a grid row up in the dashboard.",
 	},
-	"pinDashboard": {
+	"pin_dashboard": {
 		Summary:     "Pin a dashboard",
 		Description: "Pin dashboard to top of dashboard list.",
 	},
-	"publicListSpanGroups": {
+	"public_list_span_groups": {
 		Summary:     "List groups",
 		Description: "List span groups (public API). Stable API for listing aggregated span groups. Supports basic search and duration filtering. For advanced aggregation with UQL queries (GROUP BY, HAVING, aggregate functions), use list_span_groups instead. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"publicListSpans": {
+	"public_list_spans": {
 		Summary:     "List spans",
 		Description: "List spans (public API). Stable API for listing spans by trace_id, span_id, or parent_id. Best for retrieving known spans when you already have an ID. For advanced filtering with UQL queries (WHERE, search, system filtering), use list_spans instead. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"queryQuantiles": {
+	"query_quantiles": {
 		Summary:     "Quantiles",
 		Description: "Query duration percentiles (p50, p90, p99) and count/error rate over time. Use this to identify latency outliers, track performance degradation, or compare SLO compliance. Returns named timeseries: count, countPerMin, errorCount, errorCountPerMin, durationP50, durationP90, durationP99, durationMax. Supports WHERE filters (e.g. where service_name = 'myservice'), full-text search, system filtering (e.g. httpserver:all), and duration filtering. Use timeseries instead when you need custom aggregation queries with GROUP BY. Use list_span_groups instead when you need a single aggregated snapshot. Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"queryTimeseries": {
+	"query_timeseries": {
 		Summary:     "Timeseries",
 		Description: "Query time-bucketed aggregation data for spans. Use this to analyze trends over time, detect anomalies, or build charts. Returns aligned timestamps with auto-computed interval based on the time range. Use UQL aggregation query (e.g. perMin(count()) | group by service_name) with aggregate functions: count(), avg(), sum(), p50(), p90(), p99(), etc. Use column parameter to select specific aggregate columns for the timeseries. Supports WHERE filters, full-text search, system filtering, and duration filtering. Returns groups with arrays of float values aligned with the time array. Use list_span_groups instead when you need a single aggregated snapshot (not time-bucketed). Use quantiles instead when you only need latency percentiles (p50/p90/p99). Documentation: https://uptrace.dev/features/querying/spans",
 	},
-	"resetDashboard": {
+	"reset_dashboard": {
 		Summary:     "Reset a dashboard",
 		Description: "Reset dashboard to template or reset layout.",
 	},
-	"syncFixtures": {
+	"sync_fixtures": {
 		Summary:     "Sync fixtures",
 		Description: "Create, update, or delete users, orgs, projects, and related resources using fixture keys.",
 	},
-	"unpinDashboard": {
+	"unpin_dashboard": {
 		Summary:     "Unpin a dashboard",
 		Description: "Unpin dashboard from top of dashboard list.",
 	},
-	"updateDashboardFromYAML": {
+	"update_dashboard_from_yaml": {
 		Summary:     "Update dashboard from YAML",
 		Description: "Update an existing dashboard from YAML definition. Use get_dashboard_yaml first to retrieve the current YAML, then modify and submit. The API strictly rejects unknown fields. Table overrides use column + properties (array of {name, value}). Grid item overrides use matchers + properties (array of {name, value}). Documentation: https://uptrace.dev/features/dashboards",
 	},
-	"updateDashboardGrid": {
+	"update_dashboard_grid": {
 		Summary:     "Update dashboard grid query",
 		Description: "Update the global grid query filter for a dashboard.",
 	},
-	"updateDashboardTable": {
+	"update_dashboard_table": {
 		Summary:     "Update dashboard table",
 		Description: "Update the table configuration of a dashboard.",
 	},
-	"updateGridItem": {
+	"update_grid_item": {
 		Summary:     "Update grid item",
 		Description: "Update an existing grid item.",
 	},
-	"updateGridRow": {
+	"update_grid_row": {
 		Summary:     "Update grid row",
 		Description: "Update an existing grid row.",
 	},
-	"updateMonitor": {
+	"update_monitor": {
 		Summary:     "Update a monitor",
 		Description: "Update a metric or error monitor by ID.",
 	},
-	"updateNotificationChannel": {
+	"update_notification_channel": {
 		Summary:     "Update notification channel",
 		Description: "Update an existing notification channel.",
 	},

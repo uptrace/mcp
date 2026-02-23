@@ -162,6 +162,27 @@ func (l ListDashboardTagsPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
+type ListDashboardTemplatesPath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+}
+
+func (l ListDashboardTemplatesPath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(l))
+}
+
+type GetDashboardTemplatePath struct {
+	// ProjectID Uptrace project ID.
+	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
+
+	// TemplateID Dashboard template ID.
+	TemplateID string `json:"template_id" jsonschema:"Dashboard template ID." validate:"required"`
+}
+
+func (g GetDashboardTemplatePath) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(g))
+}
+
 type ExploreMetricsPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
@@ -192,12 +213,12 @@ func (l ListMetricAttributeValuesPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(l))
 }
 
-type CreateDashboardFromYAMLPath struct {
+type CreateDashboardFromYamlPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 }
 
-func (c CreateDashboardFromYAMLPath) Validate() error {
+func (c CreateDashboardFromYamlPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(c))
 }
 
@@ -225,7 +246,7 @@ func (d DeleteDashboardPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(d))
 }
 
-type GetDashboardYAMLPath struct {
+type GetDashboardYamlPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
@@ -233,11 +254,11 @@ type GetDashboardYAMLPath struct {
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
 }
 
-func (g GetDashboardYAMLPath) Validate() error {
+func (g GetDashboardYamlPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(g))
 }
 
-type UpdateDashboardFromYAMLPath struct {
+type UpdateDashboardFromYamlPath struct {
 	// ProjectID Uptrace project ID.
 	ProjectID ProjectID `json:"project_id" jsonschema:"Uptrace project ID." validate:"required"`
 
@@ -245,7 +266,7 @@ type UpdateDashboardFromYAMLPath struct {
 	DashboardID DashboardID `json:"dashboard_id" jsonschema:"Dashboard ID." validate:"required"`
 }
 
-func (u UpdateDashboardFromYAMLPath) Validate() error {
+func (u UpdateDashboardFromYamlPath) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(u))
 }
 

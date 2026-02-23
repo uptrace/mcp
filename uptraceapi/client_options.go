@@ -888,6 +888,94 @@ func (o *ListDashboardTagsRequestOptions) GetHeader() (map[string]string, error)
 	return nil, nil
 }
 
+// ListDashboardTemplatesRequestOptions is the options needed to make a request to ListDashboardTemplates.
+type ListDashboardTemplatesRequestOptions struct {
+	PathParams *ListDashboardTemplatesPath
+}
+
+// Validate validates all the fields in the options.
+// Use it if fields validation was not run.
+func (o *ListDashboardTemplatesRequestOptions) Validate() error {
+	var errors runtime.ValidationErrors
+
+	if o.PathParams != nil {
+		if v, ok := any(o.PathParams).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("PathParams", err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+
+	return errors
+}
+
+// GetPathParams returns the path params as a map.
+func (o *ListDashboardTemplatesRequestOptions) GetPathParams() (map[string]any, error) {
+	return runtime.AsMap[any](o.PathParams)
+}
+
+// GetQuery returns the query params as a map.
+func (o *ListDashboardTemplatesRequestOptions) GetQuery() (map[string]any, error) {
+	return nil, nil
+}
+
+// GetBody returns the payload in any type that can be marshalled to JSON by the client.
+func (o *ListDashboardTemplatesRequestOptions) GetBody() any {
+	return nil
+}
+
+// GetHeader returns the headers as a map.
+func (o *ListDashboardTemplatesRequestOptions) GetHeader() (map[string]string, error) {
+	return nil, nil
+}
+
+// GetDashboardTemplateRequestOptions is the options needed to make a request to GetDashboardTemplate.
+type GetDashboardTemplateRequestOptions struct {
+	PathParams *GetDashboardTemplatePath
+}
+
+// Validate validates all the fields in the options.
+// Use it if fields validation was not run.
+func (o *GetDashboardTemplateRequestOptions) Validate() error {
+	var errors runtime.ValidationErrors
+
+	if o.PathParams != nil {
+		if v, ok := any(o.PathParams).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append("PathParams", err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+
+	return errors
+}
+
+// GetPathParams returns the path params as a map.
+func (o *GetDashboardTemplateRequestOptions) GetPathParams() (map[string]any, error) {
+	return runtime.AsMap[any](o.PathParams)
+}
+
+// GetQuery returns the query params as a map.
+func (o *GetDashboardTemplateRequestOptions) GetQuery() (map[string]any, error) {
+	return nil, nil
+}
+
+// GetBody returns the payload in any type that can be marshalled to JSON by the client.
+func (o *GetDashboardTemplateRequestOptions) GetBody() any {
+	return nil
+}
+
+// GetHeader returns the headers as a map.
+func (o *GetDashboardTemplateRequestOptions) GetHeader() (map[string]string, error) {
+	return nil, nil
+}
+
 // ExploreMetricsRequestOptions is the options needed to make a request to ExploreMetrics.
 type ExploreMetricsRequestOptions struct {
 	PathParams *ExploreMetricsPath
@@ -1047,15 +1135,15 @@ func (o *ListMetricAttributeValuesRequestOptions) GetHeader() (map[string]string
 	return nil, nil
 }
 
-// CreateDashboardFromYAMLRequestOptions is the options needed to make a request to CreateDashboardFromYAML.
-type CreateDashboardFromYAMLRequestOptions struct {
-	PathParams *CreateDashboardFromYAMLPath
-	Body       *CreateDashboardFromYAMLBody
+// CreateDashboardFromYamlRequestOptions is the options needed to make a request to CreateDashboardFromYaml.
+type CreateDashboardFromYamlRequestOptions struct {
+	PathParams *CreateDashboardFromYamlPath
+	Body       *CreateDashboardFromYamlBody
 }
 
 // Validate validates all the fields in the options.
 // Use it if fields validation was not run.
-func (o *CreateDashboardFromYAMLRequestOptions) Validate() error {
+func (o *CreateDashboardFromYamlRequestOptions) Validate() error {
 	var errors runtime.ValidationErrors
 
 	if o.PathParams != nil {
@@ -1081,22 +1169,22 @@ func (o *CreateDashboardFromYAMLRequestOptions) Validate() error {
 }
 
 // GetPathParams returns the path params as a map.
-func (o *CreateDashboardFromYAMLRequestOptions) GetPathParams() (map[string]any, error) {
+func (o *CreateDashboardFromYamlRequestOptions) GetPathParams() (map[string]any, error) {
 	return runtime.AsMap[any](o.PathParams)
 }
 
 // GetQuery returns the query params as a map.
-func (o *CreateDashboardFromYAMLRequestOptions) GetQuery() (map[string]any, error) {
+func (o *CreateDashboardFromYamlRequestOptions) GetQuery() (map[string]any, error) {
 	return nil, nil
 }
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
-func (o *CreateDashboardFromYAMLRequestOptions) GetBody() any {
+func (o *CreateDashboardFromYamlRequestOptions) GetBody() any {
 	return o.Body
 }
 
 // GetHeader returns the headers as a map.
-func (o *CreateDashboardFromYAMLRequestOptions) GetHeader() (map[string]string, error) {
+func (o *CreateDashboardFromYamlRequestOptions) GetHeader() (map[string]string, error) {
 	return nil, nil
 }
 
@@ -1188,14 +1276,14 @@ func (o *DeleteDashboardRequestOptions) GetHeader() (map[string]string, error) {
 	return nil, nil
 }
 
-// GetDashboardYAMLRequestOptions is the options needed to make a request to GetDashboardYAML.
-type GetDashboardYAMLRequestOptions struct {
-	PathParams *GetDashboardYAMLPath
+// GetDashboardYamlRequestOptions is the options needed to make a request to GetDashboardYaml.
+type GetDashboardYamlRequestOptions struct {
+	PathParams *GetDashboardYamlPath
 }
 
 // Validate validates all the fields in the options.
 // Use it if fields validation was not run.
-func (o *GetDashboardYAMLRequestOptions) Validate() error {
+func (o *GetDashboardYamlRequestOptions) Validate() error {
 	var errors runtime.ValidationErrors
 
 	if o.PathParams != nil {
@@ -1213,34 +1301,34 @@ func (o *GetDashboardYAMLRequestOptions) Validate() error {
 }
 
 // GetPathParams returns the path params as a map.
-func (o *GetDashboardYAMLRequestOptions) GetPathParams() (map[string]any, error) {
+func (o *GetDashboardYamlRequestOptions) GetPathParams() (map[string]any, error) {
 	return runtime.AsMap[any](o.PathParams)
 }
 
 // GetQuery returns the query params as a map.
-func (o *GetDashboardYAMLRequestOptions) GetQuery() (map[string]any, error) {
+func (o *GetDashboardYamlRequestOptions) GetQuery() (map[string]any, error) {
 	return nil, nil
 }
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
-func (o *GetDashboardYAMLRequestOptions) GetBody() any {
+func (o *GetDashboardYamlRequestOptions) GetBody() any {
 	return nil
 }
 
 // GetHeader returns the headers as a map.
-func (o *GetDashboardYAMLRequestOptions) GetHeader() (map[string]string, error) {
+func (o *GetDashboardYamlRequestOptions) GetHeader() (map[string]string, error) {
 	return nil, nil
 }
 
-// UpdateDashboardFromYAMLRequestOptions is the options needed to make a request to UpdateDashboardFromYAML.
-type UpdateDashboardFromYAMLRequestOptions struct {
-	PathParams *UpdateDashboardFromYAMLPath
-	Body       *UpdateDashboardFromYAMLBody
+// UpdateDashboardFromYamlRequestOptions is the options needed to make a request to UpdateDashboardFromYaml.
+type UpdateDashboardFromYamlRequestOptions struct {
+	PathParams *UpdateDashboardFromYamlPath
+	Body       *UpdateDashboardFromYamlBody
 }
 
 // Validate validates all the fields in the options.
 // Use it if fields validation was not run.
-func (o *UpdateDashboardFromYAMLRequestOptions) Validate() error {
+func (o *UpdateDashboardFromYamlRequestOptions) Validate() error {
 	var errors runtime.ValidationErrors
 
 	if o.PathParams != nil {
@@ -1266,22 +1354,22 @@ func (o *UpdateDashboardFromYAMLRequestOptions) Validate() error {
 }
 
 // GetPathParams returns the path params as a map.
-func (o *UpdateDashboardFromYAMLRequestOptions) GetPathParams() (map[string]any, error) {
+func (o *UpdateDashboardFromYamlRequestOptions) GetPathParams() (map[string]any, error) {
 	return runtime.AsMap[any](o.PathParams)
 }
 
 // GetQuery returns the query params as a map.
-func (o *UpdateDashboardFromYAMLRequestOptions) GetQuery() (map[string]any, error) {
+func (o *UpdateDashboardFromYamlRequestOptions) GetQuery() (map[string]any, error) {
 	return nil, nil
 }
 
 // GetBody returns the payload in any type that can be marshalled to JSON by the client.
-func (o *UpdateDashboardFromYAMLRequestOptions) GetBody() any {
+func (o *UpdateDashboardFromYamlRequestOptions) GetBody() any {
 	return o.Body
 }
 
 // GetHeader returns the headers as a map.
-func (o *UpdateDashboardFromYAMLRequestOptions) GetHeader() (map[string]string, error) {
+func (o *UpdateDashboardFromYamlRequestOptions) GetHeader() (map[string]string, error) {
 	return nil, nil
 }
 

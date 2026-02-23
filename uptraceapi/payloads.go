@@ -124,11 +124,11 @@ func (u *UpdateMonitorBody) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CreateDashboardFromYAMLBody YAML dashboard definition.
-type CreateDashboardFromYAMLBody = string
+// CreateDashboardFromYamlBody YAML dashboard definition.
+type CreateDashboardFromYamlBody = string
 
-// UpdateDashboardFromYAMLBody YAML dashboard definition.
-type UpdateDashboardFromYAMLBody = string
+// UpdateDashboardFromYamlBody YAML dashboard definition.
+type UpdateDashboardFromYamlBody = string
 
 type UpdateDashboardTableBody = DashboardTableUpdate
 

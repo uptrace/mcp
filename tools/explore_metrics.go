@@ -29,7 +29,7 @@ func (t *ExploreMetricsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["exploreMetrics"].Description,
+		Description: uptraceapi.Operations["explore_metrics"].Description,
 	}, t.handler)
 }
 

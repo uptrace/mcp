@@ -22,8 +22,9 @@ IMPORTANT: Call all Uptrace MCP tools directly. Do NOT delegate to subagents or 
 1. **Discovers metrics** using `explore_metrics` — finds available metrics with instrument types, units, and attributes
 2. **Analyzes attributes** using `list_metric_attributes` / `list_metric_attribute_values` — identifies grouping dimensions
 3. **Groups by library** — metrics from the same `libraryName` share attributes and belong on one dashboard
-4. **Generates YAML** — produces valid dashboard YAML following the strict schema
-5. **Creates and verifies** — submits via `create_dashboard` and verifies with `get_dashboard_yaml`
+4. **Learns from templates** using `list_dashboard_templates` / `get_dashboard_template` — uses curated built-in templates as reference for correct metric combinations and query patterns
+5. **Generates YAML** — produces valid dashboard YAML following the strict schema
+6. **Creates and verifies** — submits via `create_dashboard` and verifies with `get_dashboard_yaml`
 
 ## How to Use
 
@@ -33,10 +34,11 @@ Create a monitoring dashboard in Uptrace for: **$ARGUMENTS**
 
 1. `explore_metrics` — discover metrics, group by `libraryName`
 2. `list_metric_attributes` / `list_metric_attribute_values` — find grouping attributes
-3. `list_dashboard_tags` — get available tags
-4. `get_dashboard_yaml` on a similar dashboard — learn the exact format
-5. `create_dashboard` — submit YAML
-6. `get_dashboard_yaml` — verify result
+3. `list_dashboard_templates` — find a matching built-in template to use as reference
+4. `get_dashboard_template` — fetch the template YAML to learn structure, metric combinations, and query patterns
+5. `list_dashboard_tags` — get available tags
+6. `create_dashboard` — submit YAML
+7. `get_dashboard_yaml` — verify result
 
 ## Instructions
 
@@ -80,9 +82,20 @@ Use `list_metric_attribute_values` with a specific `attr_key` including the type
 
 **CRITICAL:** Do NOT use `count()`, `p50()`, `p90()`, `p99()` on counter/gauge/additive metrics — they will error with "count is not supported for span metrics".
 
+### Learning from Templates
+
+**Always prefer built-in templates over existing project dashboards as examples.** Templates are curated and correct — project dashboards may have incorrect metric combinations, bad query patterns, or nonsensical table/grid layouts.
+
+1. Call `list_dashboard_templates` to see all available templates (id, name, description)
+2. Find a template that matches the domain you're building for (e.g. HTTP, Redis, Go runtime, PostgreSQL)
+3. Call `get_dashboard_template` with the template ID to fetch its YAML structure
+4. Use the template as a reference for metric selection, query patterns, layout, and tags
+
+Only fall back to `get_dashboard_yaml` on existing project dashboards if no matching template exists.
+
 ### Dashboard YAML Format
 
-Call `get_dashboard_yaml` on an existing dashboard to understand the structure. **WARNING:** The output contains read-only properties (`sparkline`, `color`, `aggFunc`) that the API **rejects on create/update**. Do NOT copy these properties — only use `unit` in overrides.
+**WARNING:** If you use `get_dashboard_yaml` on existing dashboards, the output contains read-only properties (`sparkline`, `color`, `aggFunc`) that the API **rejects on create/update**. Do NOT copy these properties — only use `unit` in overrides. Templates from `get_dashboard_template` do NOT have this problem.
 
 ```yaml
 schema: v2

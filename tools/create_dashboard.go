@@ -33,7 +33,7 @@ func (t *CreateDashboardTool) Register(server *mcp.Server) {
 			IdempotentHint:  false,
 			OpenWorldHint:   boolPtr(true),
 		},
-		Description: uptraceapi.Operations["createDashboardFromYAML"].Description,
+		Description: uptraceapi.Operations["create_dashboard_from_yaml"].Description,
 	}, t.handler)
 }
 
@@ -46,7 +46,7 @@ func (t *CreateDashboardTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *createDashboardInput,
-) (*mcp.CallToolResult, *uptraceapi.CreateDashboardFromYAMLResponse, error) {
+) (*mcp.CallToolResult, *uptraceapi.CreateDashboardFromYamlResponse, error) {
 	projectID := input.ProjectID
 	if projectID == 0 {
 		projectID = t.conf.Uptrace.ProjectID
@@ -68,8 +68,8 @@ func (t *CreateDashboardTool) handler(
 		}, nil, nil
 	}
 
-	opts := &uptraceapi.CreateDashboardFromYAMLRequestOptions{
-		PathParams: &uptraceapi.CreateDashboardFromYAMLPath{
+	opts := &uptraceapi.CreateDashboardFromYamlRequestOptions{
+		PathParams: &uptraceapi.CreateDashboardFromYamlPath{
 			ProjectID: projectID,
 		},
 	}
@@ -82,7 +82,7 @@ func (t *CreateDashboardTool) handler(
 		return nil
 	}
 
-	resp, err := t.client.CreateDashboardFromYAML(ctx, opts, runtime.RequestEditorFn(setBody))
+	resp, err := t.client.CreateDashboardFromYaml(ctx, opts, runtime.RequestEditorFn(setBody))
 	if err != nil {
 		return nil, nil, err
 	}

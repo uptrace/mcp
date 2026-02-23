@@ -12,19 +12,19 @@ import (
 	"github.com/uptrace/mcp/uptraceapi"
 )
 
-type UpdateDashboardYAMLTool struct {
+type UpdateDashboardYamlTool struct {
 	client *uptraceapi.Client
 	conf   *appconf.Config
 }
 
-func NewUpdateDashboardYAMLTool(client *uptraceapi.Client, conf *appconf.Config) *UpdateDashboardYAMLTool {
-	return &UpdateDashboardYAMLTool{
+func NewUpdateDashboardYamlTool(client *uptraceapi.Client, conf *appconf.Config) *UpdateDashboardYamlTool {
+	return &UpdateDashboardYamlTool{
 		client: client,
 		conf:   conf,
 	}
 }
 
-func (t *UpdateDashboardYAMLTool) Register(server *mcp.Server) {
+func (t *UpdateDashboardYamlTool) Register(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name: "update_dashboard_yaml",
 		Annotations: &mcp.ToolAnnotations{
@@ -33,7 +33,7 @@ func (t *UpdateDashboardYAMLTool) Register(server *mcp.Server) {
 			IdempotentHint:  true,
 			OpenWorldHint:   boolPtr(true),
 		},
-		Description: uptraceapi.Operations["updateDashboardFromYAML"].Description,
+		Description: uptraceapi.Operations["update_dashboard_from_yaml"].Description,
 	}, t.handler)
 }
 
@@ -43,18 +43,18 @@ type updateDashboardYAMLInput struct {
 	Body        string `json:"body" jsonschema:"YAML dashboard definition." validate:"required"`
 }
 
-func (t *UpdateDashboardYAMLTool) handler(
+func (t *UpdateDashboardYamlTool) handler(
 	ctx context.Context,
 	req *mcp.CallToolRequest,
 	input *updateDashboardYAMLInput,
-) (*mcp.CallToolResult, *uptraceapi.UpdateDashboardFromYAMLResponse, error) {
+) (*mcp.CallToolResult, *uptraceapi.UpdateDashboardFromYamlResponse, error) {
 	projectID := input.ProjectID
 	if projectID == 0 {
 		projectID = t.conf.Uptrace.ProjectID
 	}
 
-	opts := &uptraceapi.UpdateDashboardFromYAMLRequestOptions{
-		PathParams: &uptraceapi.UpdateDashboardFromYAMLPath{
+	opts := &uptraceapi.UpdateDashboardFromYamlRequestOptions{
+		PathParams: &uptraceapi.UpdateDashboardFromYamlPath{
 			ProjectID:   projectID,
 			DashboardID: input.DashboardID,
 		},
@@ -68,7 +68,7 @@ func (t *UpdateDashboardYAMLTool) handler(
 		return nil
 	}
 
-	resp, err := t.client.UpdateDashboardFromYAML(ctx, opts, runtime.RequestEditorFn(setBody))
+	resp, err := t.client.UpdateDashboardFromYaml(ctx, opts, runtime.RequestEditorFn(setBody))
 	if err != nil {
 		return nil, nil, err
 	}

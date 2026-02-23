@@ -29,7 +29,7 @@ func (t *DeleteDashboardTool) Register(server *mcp.Server) {
 			IdempotentHint:  true,
 			OpenWorldHint:   boolPtr(true),
 		},
-		Description: uptraceapi.Operations["deleteDashboard"].Description,
+		Description: uptraceapi.Operations["delete_dashboard"].Description,
 	}, t.handler)
 }
 

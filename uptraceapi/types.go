@@ -253,6 +253,75 @@ func (a AnnotationCreateRequest) Validate() error {
 	return runtime.ConvertValidatorError(typesValidator.Struct(a))
 }
 
+type ListDashboardTemplatesResponse struct {
+	Templates []DashboardTemplateItem `json:"templates" validate:"required"`
+}
+
+func (l ListDashboardTemplatesResponse) Validate() error {
+	var errors runtime.ValidationErrors
+	for i, item := range l.Templates {
+		if v, ok := any(item).(runtime.Validator); ok {
+			if err := v.Validate(); err != nil {
+				errors = errors.Append(fmt.Sprintf("Templates[%d]", i), err)
+			}
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type DashboardTemplateItem struct {
+	// ID Template ID.
+	ID string `json:"id" jsonschema:"Template ID." validate:"required"`
+
+	// Name Template name.
+	Name string `json:"name" jsonschema:"Template name." validate:"required"`
+
+	// Description Template description.
+	Description string `json:"description" jsonschema:"Template description." validate:"required"`
+}
+
+func (d DashboardTemplateItem) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(d))
+}
+
+type GetDashboardTemplateResponse struct {
+	Template DashboardTemplate `json:"template"`
+}
+
+func (g GetDashboardTemplateResponse) Validate() error {
+	var errors runtime.ValidationErrors
+	if v, ok := any(g.Template).(runtime.Validator); ok {
+		if err := v.Validate(); err != nil {
+			errors = errors.Append("Template", err)
+		}
+	}
+	if len(errors) == 0 {
+		return nil
+	}
+	return errors
+}
+
+type DashboardTemplate struct {
+	// ID Template ID.
+	ID string `json:"id" jsonschema:"Template ID." validate:"required"`
+
+	// Name Template name.
+	Name string `json:"name" jsonschema:"Template name." validate:"required"`
+
+	// Description Template description.
+	Description string `json:"description" jsonschema:"Template description." validate:"required"`
+
+	// Tags Template tags.
+	Tags []string `json:"tags,omitempty" jsonschema:"Template tags."`
+}
+
+func (d DashboardTemplate) Validate() error {
+	return runtime.ConvertValidatorError(typesValidator.Struct(d))
+}
+
 type ExploreMetricsResponse struct {
 	Metrics []ExploredMetric `json:"metrics" validate:"required"`
 	HasMore bool             `json:"hasMore"`

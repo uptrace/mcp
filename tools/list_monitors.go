@@ -29,7 +29,7 @@ func (t *ListMonitorsTool) Register(server *mcp.Server) {
 			IdempotentHint: true,
 			OpenWorldHint:  boolPtr(true),
 		},
-		Description: uptraceapi.Operations["listMonitors"].Description,
+		Description: uptraceapi.Operations["list_monitors"].Description,
 	}, t.handler)
 }
 
